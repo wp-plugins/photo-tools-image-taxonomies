@@ -1039,7 +1039,7 @@ function papt_displayTaxonomyTagCloud( $taxonomy_name = '', $format = 'flat') {
  * @param	$post_type	string	the type of post you want
  */
 function papt_getTaxonomyPosts($taxonomy = '', $term = '', $field = 'slug', $num_posts = 24, $post_type = 'attachment') {
-
+	
 	if ( ! $taxonomy ) {
 		$taxonomy = get_query_var( 'taxonomy' );	
 	}
@@ -1218,12 +1218,44 @@ function papt_load_widgets() {
 	register_widget( 'papt_displayTaxTerms' );	
 }
 
+
+/**
+ * Sets proper post_status in default loop so that it picks
+ * up attachment posts for PhotoTools Taxonomies (which
+ * are always full of attachments).
+ *
+ * @param $query	WP_Query Object
+ *
+ */
+function papt_makeTaxonomiesVisibleToLoop($query) {
+    
+    
+    if (is_tax('photos_keywords') || 
+    	is_tax('photos_people') || 
+    	is_tax('photos_city') || 
+    	is_tax('photos_state') ||
+    	is_tax('photos_country') ||
+    	is_tax('photos_camera') ||
+    	is_tax('photos_lens') ||
+    	is_tax('photos_collection')
+    
+    ) {
+    	$query->set('post_status','inherit');   
+    }
+	
+	return $query;
+}
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////
 ////
 //// Wordpress Hooks & Registrations
 ////
 ///////////////////////////////////////////////////////////////////////////////////
 
+// needed to make attachment posts visible in the default loop.
+add_filter('pre_get_posts', 'papt_makeTaxonomiesVisibleToLoop');
 add_action('add_attachment', 'papt_addAttachment');
 add_action('edit_attachment', 'papt_addAttachment');
 add_filter('wp_update_attachment_metadata', 'papt_storeNewMeta',1,2);
