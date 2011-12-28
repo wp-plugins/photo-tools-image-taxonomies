@@ -1,6 +1,6 @@
 === PhotoTools - Image Taxonomies ===
 Contributors: padams
-Donate link: http://example.com/
+Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F83AGPR2W5AXS
 Tags: photos, images, taxonomies, Lightroom, meta, meta data
 Requires at least: 3.2.1
 Tested up to: 3.2.1
