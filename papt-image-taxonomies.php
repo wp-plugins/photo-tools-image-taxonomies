@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Photo Tools - Image Taxonomies
+Plugin Name: PhotoTools - Image Taxonomies
 Plugin URI: Permalink: http://www.peteradamsphoto.com/?page_id=2506
 Description: Adds multiple photo related meta-data taxonomies to your uploaded images.
 Author: Peter Adams
@@ -1005,78 +1005,6 @@ function papt_getTaxonomyPosts($taxonomy = '', $term = '', $field = '', $num_pos
 	return new WP_Query( $args );
 }
 
-function image_caption_links( $output, $attr, $content ) {
-
-	/* We're not worried abut captions in feeds, so just return the output here. */
-	if ( is_feed() )
-		return $output;
-
-	/* Set up the default arguments. */
-	$defaults = array(
-		'id' => '',
-		'align' => 'alignnone',
-		'width' => '',
-		'caption' => ''
-	);
-
-	/* Merge the defaults with user input. */
-	$attr = shortcode_atts( $defaults, $attr );
-
-	/* If the width is less than 1 or there is no caption, return the content wrapped between the [caption]< tags. */
-	if ( 1 > $attr['width'] || empty( $attr['caption'] ) )
-		return $content;
-
-	/* Set up the attributes for the caption <div>. */
-	$attributes = ( !empty( $attr['id'] ) ? ' id="' . esc_attr( $attr['id'] ) . '"' : '' );
-	$attributes .= ' class="wp-caption ' . esc_attr( $attr['align'] ) . '"';
-	$attributes .= ' style="width: ' . esc_attr( $attr['width'] ) . 'px"';
-
-	/* Open the caption <div>. */
-	$output = '<div' . $attributes .'>';
-
-	/* Allow shortcodes for the content the caption was created for. */
-	$output .= do_shortcode( $content );
-
-	/* Append the caption text. */
-	$output .= '<p class="wp-caption-text">' . $attr['caption'] . ' <span class="image-caption-links"> <a href="'.get_attachment_link(str_replace('attachment_', '', $attr['id'])).'">image details &raquo;</a></span></p>';
-
-	/* Close the caption </div>. */
-	$output .= '</div>';
-
-	/* Return the formatted, clean caption. */
-	return $output;
-}
-
-add_filter( 'img_caption_shortcode', 'image_caption_links', 10, 3 );
-add_action('add_attachment', 'papt_addAttachment');
-add_action('edit_attachment', 'papt_addAttachment');
-add_filter('wp_update_attachment_metadata', 'papt_storeNewMeta',1,2);
-// needed to add product_id to new attachments
-add_filter('wp_generate_attachment_metadata', 'papt_storeNewMeta',1,2);
-add_action('init', 'papt_regtax');
-/* Add our function to the widgets_init hook. */
-add_action( 'widgets_init', 'papt_load_widgets' );
-add_filter("attachment_fields_to_edit", "papt_attachment_meta_form_fields", 11, 2);
-add_shortcode( 'image-group', 'imageGroupShortcodeHandler' );
-
-function imageGroupShortcodeHandler( $atts = array(), $content = null ) {
-
-	$a = shortcode_atts( 
-		array(
-   			'title' => 'Images',
-   			'foo' => 123
-   		), 
-   		$atts 
-   	);
-   	
-   	return sprintf(
-   				'<style>.image-group p { line-height: 0px;display:inline;}</style><h4>%s</h4><div class="image-group">%s</div>', 
-   				$a['title'],
-   				$content
-   	);
-}
-
-
 /** 
  * Adding our custom fields to the $form_fields array 
  * 
@@ -1122,12 +1050,12 @@ class papt_displayExif extends WP_Widget {
 	
 	function papt_displayExif() {
 		/* Widget settings. */
-		$widget_ops = array( 'classname' => 'papt_displayExif', 'description' => "Display's the EXIF info of an image." );
+		$widget_ops = array( 'classname' => 'papt_displayExif', 'description' => "Display's the EXIF info of an image. Can only be used on single image or attachment pages." );
 
 		/* Widget control settings. */
 		//$control_ops = array( 'width' => 300, 'height' => 350, 'id_base' => 'papt-displayExif-widget' );
 		
-		parent::WP_Widget(false, $name = 'Photo Tools - Display Exif',$widget_ops, $control_ops);
+		parent::WP_Widget(false, $name = 'PhotoTools - Display Exif',$widget_ops, $control_ops);
 		
 		/* Create the widget. */
 		//$this->WP_Widget( 'papt-displayExif-widget', 'Photo Tools - Display EXIF', $widget_ops, $control_ops );
@@ -1193,12 +1121,12 @@ class papt_displayTaxTerms extends WP_Widget {
 	function papt_displayTaxTerms() {
 		
 		/* Widget settings. */
-		$widget_ops = array( 'classname' => 'papt_displayTaxTerms', 'description' => "Display's the taxonomy terms of an image." );
+		$widget_ops = array( 'classname' => 'papt_displayTaxTerms', 'description' => "Display's the taxonomy terms of an image. Can only be used on single image or attachment pages." );
 
 		/* Widget control settings. */
 		//$control_ops = array( 'width' => 300, 'height' => 350, 'id_base' => 'papt-displayTax-widget' );
 		
-		parent::WP_Widget(false, $name = 'Photo Tools - Display Taxonomies', $widget_ops, $control_ops);
+		parent::WP_Widget(false, $name = 'PhotoTools - Display Taxonomies', $widget_ops, $control_ops);
 	}
 	
 	function widget( $args, $instance ) {
@@ -1247,5 +1175,20 @@ class papt_displayTaxTerms extends WP_Widget {
 		<?php
 	}
 }
+
+add_action('add_attachment', 'papt_addAttachment');
+add_action('edit_attachment', 'papt_addAttachment');
+add_filter('wp_update_attachment_metadata', 'papt_storeNewMeta',1,2);
+// needed to add product_id to new attachments
+add_filter('wp_generate_attachment_metadata', 'papt_storeNewMeta',1,2);
+add_action('init', 'papt_regtax');
+/* Add our function to the widgets_init hook. */
+add_action( 'widgets_init', 'papt_load_widgets' );
+add_filter("attachment_fields_to_edit", "papt_attachment_meta_form_fields", 11, 2);
+register_sidebar(array(
+  'name' => 'PhotoTools Image Page Sidebar',
+  'id' => 'papt-image-sidebar',
+  'description' => 'Widgets in this area will be shown on image (attachment) page templates.'
+));
 
 ?>
