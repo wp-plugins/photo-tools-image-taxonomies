@@ -9,9 +9,10 @@ Author URI: http://www.peteradamsphoto.com
 */
 
 /**
+ * PhotoTools Taxonomies
  *
- *
- *
+ * This class does the heavy lifting of extracting and accessing an image
+ * files embedded iptc, exif, and XMP meta data.
  */
 class papt_photoTaxonomies {
 	
@@ -27,11 +28,6 @@ class papt_photoTaxonomies {
 	
 		$this->plugin_dir = dirname(__FILE__).'/plugins';
 		return;
-	}
-	
-	function papt_photoTaxonomies() {
-	
-		return papt_photoTaxonomies::__construct();
 	}
 		
 	function getRawXmpValues() {
@@ -770,9 +766,6 @@ class papt_photoTaxonomies {
 		
 }
 
-/////////////////////////////////////////////////////////
-
-
 function papt_getMetaData($id) {
 	
 	$md = new papt_photoTaxonomies();
@@ -844,206 +837,6 @@ function papt_addAttachmentTags($id, $md) {
 		wp_set_object_terms($id, $lens, 'photos_lens', $append = false);
 	}
 
-}
-
-function papt_storeNewMeta($data, $id) {
-	
-	$md = new papt_photoTaxonomies();
-	$file = wp_get_attachment_url($id);
-	$md->loadFromFile($file);
-	$data['papt_meta'] = $md->getAllMetaData();
-	//print_r($data['papt_meta']);
-	papt_addAttachmentTags($id, $md);
-
-	return $data;
-}
-
-function papt_displayTaxonomyLabel($taxonomy_name = '') {
-	
-	if ( ! $taxonomy_name ) {
-		
-		$taxonomy_name = get_query_var( 'taxonomy' );
-	}
-	
-	$t = get_taxonomy($taxonomy_name);
-	//print_r($t);
-	echo $t->label;
-}
-
-function papt_getTaxonomyLabel($taxonomy_name = '') {
-	
-	if ( ! $taxonomy_name ) {
-		
-		$taxonomy_name = get_query_var( 'taxonomy' );
-	}
-	
-	$t = get_taxonomy($taxonomy_name);
-	return $t->object_type;
-}
-
-function papt_displayTaxonomyTagCloud( $taxonomy_name = '', $format = 'flat') {
-	
-	if ( ! $taxonomy_name ) {
-		
-		$taxonomy_name = get_query_var( 'taxonomy' );
-	}
-	
-	wp_tag_cloud( array( 'taxonomy' => $taxonomy_name, 'format' => $format ) );
-}
-
-function papt_regtax() {
-		
-	register_taxonomy('photos_camera', 'attachment', array(
-							'hierarchical' => false, 
-							'label' => __('Camera', 'series'),
-							'query_var' => 'photos_camera', 
-							'rewrite' => false,
-							'public'	=> true ));
-							
-	register_taxonomy('photos_lens', 'attachment', array( 
-							'hierarchical' => false, 
-							'label' => __('Lens', 'series'), 
-							'query_var' => 'photos_lens', 
-							'rewrite' => false,
-							'public'	=> true ));
-							
-	register_taxonomy( 'photos_city', 'attachment', array(
-							'hierarchical' => false, 
-							'label' => __('Photo City', 'series'), 
-							'query_var' => 'photos_city', 
-							'rewrite' => false,
-							'public'	=> true ));
-							
-	register_taxonomy( 'photos_state', 'attachment', array(
-							'hierarchical' => false, 
-							'label' => __('Photo State', 'series'), 
-							'query_var' => 'photos_state', 
-							'rewrite' => false,
-							'public'	=> true ));
-							
-	register_taxonomy( 'photos_country', 'attachment', array(
-							'hierarchical' => false, 
-							'label' => __('Photo Country', 'series'), 
-							'query_var' => 'photos_country', 
-							'rewrite' => false,
-							'public'	=> true ));
-							
-	register_taxonomy( 'photos_people', 'attachment', array(
-							'hierarchical' => false, 
-							'label' => __('Photo People', 'series'), 
-							'query_var' => 'photos_people', 
-							'rewrite' => false,
-							'public'	=> true ));
-							
-	register_taxonomy('photos_keywords', 'attachment', array( 
-					   		'hierarchical' => false, 
-							'label' => __('Photo Keywords', 'series'), 
-							'query_var' => 'photos_keywords', 
-							'rewrite' => false,
-							'public'	=> true));
-	
-	register_taxonomy( 'photos_collection', 'attachment', array(
-							'hierarchical' => false, 
-							'label' => __('Photo Collection', 'series'), 
-							'query_var' => 'photos_collection', 
-							'rewrite' => false,
-							'public'	=> true ));
-}
-
-
-function papt_getTaxonomyPosts($taxonomy = '', $term = '', $field = '', $num_posts = 24, $post_type = 'attachment') {
-
-	if ( ! $taxonomy ) {
-		$taxonomy = get_query_var( 'taxonomy' );	
-	}
-	
-	if ( ! $field ) {
-		$field = 'slug';
-	}
-	
-	if ( ! $term ) {
-		
-		$term = get_query_var( 'term' );
-	}
-	
-	$paged = (get_query_var('page')) ? (int) get_query_var('page') : 1;
-	
-	$args = array(
-		'tax_query' => array(),
-		//'showposts' => $num_posts,
-		'posts_per_page' 	=> $num_posts,
-		'post_type' => $post_type,
-		'paged' 	=> $paged,
-		'post_status'		=>'inherit'
-	);
-	
-	$taxes = array();
-	
-	if ( ! is_array($taxonomy) ) {
-	
-		$taxes[] = $taxonomy;
-	} else {
-		$taxes = $taxonomy;
-	}
-
-	foreach ( $taxes as $tax) {
-	
-		$args['tax_query'][] = array(
-									'taxonomy' => $tax,
-									'field' => $field,
-									'terms' => $term
-		);
-	}
-	
-	// set realtion if more than one taxonomy
-	if ( isset( $taxes[1] ) ) {
-	
-		$args['tax_query']['relation'] = 'OR';
-	}
-	
-	
-	return new WP_Query( $args );
-}
-
-/** 
- * Adding our custom fields to the $form_fields array 
- * 
- * @param array $form_fields 
- * @param object $post 
- * @return array 
- */  
-function papt_attachment_meta_form_fields( $form_fields, $post ) {  
-    // $form_fields is a special array of fields to include in the attachment form  
-    // $post is the attachment record in the database  
-    //     $post->post_type == 'attachment'  
-    // (attachments are treated as posts in WordPress)  
-  	
-  	$md = papt_getMetaData($post->ID);
-  	
-  	$author = $md->getXmp('xapRights:Owner');
-  	
-	if ($post->post_type === 'attachment') {  
-   		
-   		// populate the alt text with the title and author slug.
-   		//$form_fields["image_alt"]['label'] = 'Alt Text';
-   		//$form_fields["image_alt"]['input'] = 'text';
-   		$form_fields["image_alt"]['value'] = $post->post_title . ' by ' . $md->getCopyrightHolder() . '. ';  
-   		//populate the caption with the caption.
-    	$form_fields["post_excerpt"]['value'] = $post->post_content;    
-    }
-    //print_r($form_fields);
-  
-    return $form_fields;  
-} 
-
-
-
-
-/* Function that registers our widget. */
-function papt_load_widgets() {
-
-	register_widget( 'papt_displayExif' );
-	register_widget( 'papt_displayTaxTerms' );	
 }
 
 class papt_displayExif extends WP_Widget {
@@ -1175,6 +968,261 @@ class papt_displayTaxTerms extends WP_Widget {
 		<?php
 	}
 }
+
+
+///////////////////////////////////////////////////////////////////////////////////
+////
+//// Wordpress Template Functions
+////
+///////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Displays the label for a specific Taxonomy
+ *
+ * @param	$taxonmy_name	string	the name of the taxonomy
+ */
+function papt_displayTaxonomyLabel($taxonomy_name = '') {
+	
+	if ( ! $taxonomy_name ) {
+		
+		$taxonomy_name = get_query_var( 'taxonomy' );
+	}
+	
+	$t = get_taxonomy($taxonomy_name);
+	//print_r($t);
+	echo $t->label;
+}
+
+/**
+ * Returns the label for a specific Taxonomy
+ *
+ * @param	$taxonmy_name	string	the name of the taxonomy
+ * @depricated
+ */
+function papt_getTaxonomyLabel($taxonomy_name = '') {
+	
+	if ( ! $taxonomy_name ) {
+		
+		$taxonomy_name = get_query_var( 'taxonomy' );
+	}
+	
+	$t = get_taxonomy($taxonomy_name);
+	return $t->object_type;
+}
+
+/**
+ * Displays a tag cloud for a specific taxonomy
+ *
+ * This functinon basically just a wrapper for wordpress wp_tag_cloud()
+ *
+ * @param	$taxonomy	string	the name of the taxonomy
+ * @param	$format		string	the tag cloud format
+ * @link	http://codex.wordpress.org/Function_Reference/wp_tag_cloud
+ */
+function papt_displayTaxonomyTagCloud( $taxonomy_name = '', $format = 'flat') {
+	
+	if ( ! $taxonomy_name ) {
+		
+		$taxonomy_name = get_query_var( 'taxonomy' );
+	}
+	
+	wp_tag_cloud( array( 'taxonomy' => $taxonomy_name, 'format' => $format ) );
+}
+
+/**
+ * Retrieves a list of posts by Taxonomy and Term
+ *
+ * @param	$taxonomy	string	name of the taxonomy.
+ * @param	$term		string	the term
+ * @param	$field		string 	the taxonomy field to query
+ * @param	$num_posts	integer	the number of posts you want
+ * @param	$post_type	string	the type of post you want
+ */
+function papt_getTaxonomyPosts($taxonomy = '', $term = '', $field = 'slug', $num_posts = 24, $post_type = 'attachment') {
+
+	if ( ! $taxonomy ) {
+		$taxonomy = get_query_var( 'taxonomy' );	
+	}
+	
+	if ( ! $field ) {
+		$field = 'slug';
+	}
+	
+	if ( ! $term ) {
+		
+		$term = get_query_var( 'term' );
+	}
+	
+	$paged = (get_query_var('page')) ? (int) get_query_var('page') : 1;
+	
+	$args = array(
+		'tax_query' => array(),
+		//'showposts' => $num_posts,
+		'posts_per_page' 	=> $num_posts,
+		'post_type' => $post_type,
+		'paged' 	=> $paged,
+		'post_status'		=>'inherit'
+	);
+	
+	$taxes = array();
+	
+	if ( ! is_array($taxonomy) ) {
+	
+		$taxes[] = $taxonomy;
+	} else {
+		$taxes = $taxonomy;
+	}
+
+	foreach ( $taxes as $tax) {
+	
+		$args['tax_query'][] = array(
+									'taxonomy' => $tax,
+									'field' => $field,
+									'terms' => $term
+		);
+	}
+	
+	// set realtion if more than one taxonomy
+	if ( isset( $taxes[1] ) ) {
+	
+		$args['tax_query']['relation'] = 'OR';
+	}
+	
+	
+	return new WP_Query( $args );
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+////
+//// Wordpress Hook Handler Functions
+////
+///////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Registers PhotoTools custom Taxonomies
+ */
+function papt_regtax() {
+		
+	register_taxonomy('photos_camera', 'attachment', array(
+							'hierarchical' => false, 
+							'label' => __('Camera', 'series'),
+							'query_var' => 'photos_camera', 
+							'rewrite' => false,
+							'public'	=> true ));
+							
+	register_taxonomy('photos_lens', 'attachment', array( 
+							'hierarchical' => false, 
+							'label' => __('Lens', 'series'), 
+							'query_var' => 'photos_lens', 
+							'rewrite' => false,
+							'public'	=> true ));
+							
+	register_taxonomy( 'photos_city', 'attachment', array(
+							'hierarchical' => false, 
+							'label' => __('Photo City', 'series'), 
+							'query_var' => 'photos_city', 
+							'rewrite' => false,
+							'public'	=> true ));
+							
+	register_taxonomy( 'photos_state', 'attachment', array(
+							'hierarchical' => false, 
+							'label' => __('Photo State', 'series'), 
+							'query_var' => 'photos_state', 
+							'rewrite' => false,
+							'public'	=> true ));
+							
+	register_taxonomy( 'photos_country', 'attachment', array(
+							'hierarchical' => false, 
+							'label' => __('Photo Country', 'series'), 
+							'query_var' => 'photos_country', 
+							'rewrite' => false,
+							'public'	=> true ));
+							
+	register_taxonomy( 'photos_people', 'attachment', array(
+							'hierarchical' => false, 
+							'label' => __('Photo People', 'series'), 
+							'query_var' => 'photos_people', 
+							'rewrite' => false,
+							'public'	=> true ));
+							
+	register_taxonomy('photos_keywords', 'attachment', array( 
+					   		'hierarchical' => false, 
+							'label' => __('Photo Keywords', 'series'), 
+							'query_var' => 'photos_keywords', 
+							'rewrite' => false,
+							'public'	=> true));
+	
+	register_taxonomy( 'photos_collection', 'attachment', array(
+							'hierarchical' => false, 
+							'label' => __('Photo Collection', 'series'), 
+							'query_var' => 'photos_collection', 
+							'rewrite' => false,
+							'public'	=> true ));
+}
+
+/**
+ * Stores addtional PhotoTools meta data as part of the Post's meta field.
+ *
+ * @param 	$data	array	the post's meta data array
+ * @param	$id	integer	the post's ID.
+ */
+function papt_storeNewMeta($data, $id) {
+	
+	$md = new papt_photoTaxonomies();
+	$file = wp_get_attachment_url($id);
+	$md->loadFromFile($file);
+	$data['papt_meta'] = $md->getAllMetaData();
+	//print_r($data['papt_meta']);
+	papt_addAttachmentTags($id, $md);
+
+	return $data;
+}
+
+/** 
+ * Populates ALT text and excerpt fields on image attachment form 
+ * 
+ * @param array $form_fields 
+ * @param object $post 
+ * @return array 
+ */  
+function papt_attachment_meta_form_fields( $form_fields, $post ) {  
+    // $form_fields is a special array of fields to include in the attachment form  
+    // $post is the attachment record in the database  
+    //     $post->post_type == 'attachment'  
+    // (attachments are treated as posts in WordPress)  
+  	
+  	$md = papt_getMetaData($post->ID);
+  	
+  	$author = $md->getXmp('xapRights:Owner');
+  	
+	if ($post->post_type === 'attachment') {  
+   		
+   		// populate the alt text with the title and author slug.
+   		//$form_fields["image_alt"]['label'] = 'Alt Text';
+   		//$form_fields["image_alt"]['input'] = 'text';
+   		$form_fields["image_alt"]['value'] = $post->post_title . ' by ' . $md->getCopyrightHolder() . '. ';  
+   		//populate the caption with the caption.
+    	$form_fields["post_excerpt"]['value'] = $post->post_content;    
+    }
+    //print_r($form_fields);
+  
+    return $form_fields;  
+} 
+
+/**
+ * Registers Wordpress widgets 
+ */
+function papt_load_widgets() {
+
+	register_widget( 'papt_displayExif' );
+	register_widget( 'papt_displayTaxTerms' );	
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+////
+//// Wordpress Hooks & Registrations
+////
+///////////////////////////////////////////////////////////////////////////////////
 
 add_action('add_attachment', 'papt_addAttachment');
 add_action('edit_attachment', 'papt_addAttachment');
