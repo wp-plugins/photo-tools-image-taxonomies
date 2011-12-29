@@ -19,7 +19,7 @@ The plugin also provides widget and template functions for displaying EXIF and t
 
 1. Upload the `photo-tools-image-taxonomies` plugin folder to your `/wp-content/plugins/` directory
 1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Add the PhotoTools widgets sidebar by adding `<?php dynamic_sidebar('papt-image-sidebar'); ?>` to your attachment page template.
+1. Add the PhotoPress widgets sidebar by adding `<?php dynamic_sidebar('papt-image-sidebar'); ?>` to your attachment page template.
 1. Populate this sidebar with PhotoTools Widgets from the `Appearance > Widgets` menu in WordPress.
 
 == Frequently Asked Questions ==

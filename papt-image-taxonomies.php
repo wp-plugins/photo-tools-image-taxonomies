@@ -848,7 +848,7 @@ class papt_displayExif extends WP_Widget {
 		/* Widget control settings. */
 		//$control_ops = array( 'width' => 300, 'height' => 350, 'id_base' => 'papt-displayExif-widget' );
 		
-		parent::WP_Widget(false, $name = 'PhotoTools - Display Exif',$widget_ops, $control_ops);
+		parent::WP_Widget(false, $name = 'PhotoPress - Display Exif',$widget_ops, $control_ops);
 		
 		/* Create the widget. */
 		//$this->WP_Widget( 'papt-displayExif-widget', 'Photo Tools - Display EXIF', $widget_ops, $control_ops );
@@ -919,7 +919,7 @@ class papt_displayTaxTerms extends WP_Widget {
 		/* Widget control settings. */
 		//$control_ops = array( 'width' => 300, 'height' => 350, 'id_base' => 'papt-displayTax-widget' );
 		
-		parent::WP_Widget(false, $name = 'PhotoTools - Display Taxonomies', $widget_ops, $control_ops);
+		parent::WP_Widget(false, $name = 'PhotoPress - Display Taxonomies', $widget_ops, $control_ops);
 	}
 	
 	function widget( $args, $instance ) {
