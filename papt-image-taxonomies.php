@@ -1,7 +1,7 @@
 <?php
 /*
-Plugin Name: PhotoTools - Image Taxonomies
-Plugin URI: Permalink: http://www.peteradamsphoto.com/?page_id=2506
+Plugin Name: PhotoPress - Image Taxonomies
+Plugin URI: Permalink: http://www.peteradamsphoto.com/?page_id=3148
 Description: Adds multiple photo related meta-data taxonomies to your uploaded images.
 Author: Peter Adams
 Version: 1.0
@@ -9,7 +9,7 @@ Author URI: http://www.peteradamsphoto.com
 */
 
 /**
- * PhotoTools Taxonomies
+ * PhotoPress Taxonomies
  *
  * This class does the heavy lifting of extracting and accessing an image
  * files embedded iptc, exif, and XMP meta data.

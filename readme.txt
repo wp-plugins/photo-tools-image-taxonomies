@@ -1,10 +1,10 @@
-=== PhotoTools - Image Taxonomies ===
+=== PhotoPress - Image Taxonomies ===
 Contributors: padams
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F83AGPR2W5AXS
 Tags: photos, images, taxonomies, Lightroom, meta, meta data
 Requires at least: 3.2.1
 Tested up to: 3.2.1
-Stable tag: 1.0
+Stable tag: 1.1
 
 This plugin extracts additional meta-data from the EXIF and XMP of uploaded images for use in populating a variety of photo specific taxonomies.
 
@@ -38,3 +38,7 @@ You want an easy way to transfer and display the image meta-data that you added 
 = 1.0 =
 
 Initial version of plugin.
+
+= 1.1 =
+
+Name change to PhotoPress - Image Taxonomies
