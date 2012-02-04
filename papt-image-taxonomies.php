@@ -1053,7 +1053,7 @@ function papt_getTaxonomyPosts($taxonomy = '', $term = '', $field = 'slug', $num
 		$term = get_query_var( 'term' );
 	}
 	
-	$paged = (get_query_var('page')) ? (int) get_query_var('page') : 1;
+	$paged = (get_query_var('paged')) ? (int) get_query_var('paged') : 1;
 	
 	$args = array(
 		'tax_query' => array(),
@@ -1255,7 +1255,7 @@ function papt_makeTaxonomiesVisibleToLoop($query) {
 ///////////////////////////////////////////////////////////////////////////////////
 
 // needed to make attachment posts visible in the default loop.
-add_filter('pre_get_posts', 'papt_makeTaxonomiesVisibleToLoop');
+//add_filter('pre_get_posts', 'papt_makeTaxonomiesVisibleToLoop');
 add_action('add_attachment', 'papt_addAttachment');
 add_action('edit_attachment', 'papt_addAttachment');
 add_filter('wp_update_attachment_metadata', 'papt_storeNewMeta',1,2);
