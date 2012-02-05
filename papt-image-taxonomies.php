@@ -1053,7 +1053,14 @@ function papt_getTaxonomyPosts($taxonomy = '', $term = '', $field = 'slug', $num
 		$term = get_query_var( 'term' );
 	}
 	
-	$paged = (get_query_var('paged')) ? (int) get_query_var('paged') : 1;
+	// normal paging
+	$paged = (get_query_var('paged')) ? (int) get_query_var('paged') : '';
+	
+	// needed for use on taxonomy.php for some reason
+	if ( ! $paged ) {
+		echo 'hello';
+		$paged = (get_query_var('page')) ? (int) get_query_var('page') : 1;	
+	}
 	
 	$args = array(
 		'tax_query' => array(),
