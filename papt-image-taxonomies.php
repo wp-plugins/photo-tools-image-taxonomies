@@ -1058,7 +1058,7 @@ function papt_getTaxonomyPosts($taxonomy = '', $term = '', $field = 'slug', $num
 	
 	// needed for use on taxonomy.php for some reason
 	if ( ! $paged ) {
-		echo 'hello';
+		
 		$paged = (get_query_var('page')) ? (int) get_query_var('page') : 1;	
 	}
 	
