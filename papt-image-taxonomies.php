@@ -776,7 +776,7 @@ function papt_getMetaData($id) {
 		$md->loadFromArray($mdata['papt_meta']);
 		
 	} else {
-		$file = wp_get_attachment_url($id);
+		$file = get_attached_file($id);
 		$md->loadFromFile($file);	
 	}
 	
@@ -785,7 +785,7 @@ function papt_getMetaData($id) {
 
 function papt_getMetaDataFromFile($id) {
 	$md = new papt_photoTaxonomies();
-	$file = wp_get_attachment_url($id);
+	$file = get_attached_file($id);
 	$md->loadFromFile($file);
 	return $md;	
 	
@@ -794,7 +794,7 @@ function papt_getMetaDataFromFile($id) {
 function papt_addAttachment($id) {
 	
 	//extract metadata from file	
-	$file = wp_get_attachment_url($id);
+	$file = get_attached_file($id);
 	$md = new papt_photoTaxonomies();
 	$md->loadFromFile($file);
 	
@@ -1019,14 +1019,14 @@ function papt_getTaxonomyLabel($taxonomy_name = '') {
  * @param	$format		string	the tag cloud format
  * @link	http://codex.wordpress.org/Function_Reference/wp_tag_cloud
  */
-function papt_displayTaxonomyTagCloud( $taxonomy_name = '', $format = 'flat') {
+function papt_displayTaxonomyTagCloud( $args = array() ) {
 	
-	if ( ! $taxonomy_name ) {
+	if ( ! isset( $args['taxonomy'] ) ) {
 		
-		$taxonomy_name = get_query_var( 'taxonomy' );
+		$args['taxonomy'] = get_query_var( 'taxonomy' );
 	}
 	
-	wp_tag_cloud( array( 'taxonomy' => $taxonomy_name, 'format' => $format ) );
+	wp_tag_cloud( $args );
 }
 
 /**
@@ -1038,7 +1038,7 @@ function papt_displayTaxonomyTagCloud( $taxonomy_name = '', $format = 'flat') {
  * @param	$num_posts	integer	the number of posts you want
  * @param	$post_type	string	the type of post you want
  */
-function papt_getTaxonomyPosts($taxonomy = '', $term = '', $field = 'slug', $num_posts = 24, $post_type = 'attachment') {
+function papt_getTaxonomyPosts($taxonomy = '', $term = '', $field = 'slug', $num_posts = 25, $post_type = 'attachment') {
 	
 	if ( ! $taxonomy ) {
 		$taxonomy = get_query_var( 'taxonomy' );	
@@ -1064,11 +1064,13 @@ function papt_getTaxonomyPosts($taxonomy = '', $term = '', $field = 'slug', $num
 	
 	$args = array(
 		'tax_query' => array(),
-		//'showposts' => $num_posts,
-		'posts_per_page' 	=> $num_posts,
-		'post_type' => $post_type,
-		'paged' 	=> $paged,
+		'showposts' 		=> $num_posts,
+		//'posts_per_page' 	=> $num_posts,
+		'post_type' 		=> $post_type,
+		'paged' 			=> $paged,
 		'post_status'		=>'inherit'
+		//'no_found_rows' => true
+		
 	);
 	
 	$taxes = array();
@@ -1085,7 +1087,8 @@ function papt_getTaxonomyPosts($taxonomy = '', $term = '', $field = 'slug', $num
 		$args['tax_query'][] = array(
 									'taxonomy' => $tax,
 									'field' => $field,
-									'terms' => $term
+									'terms' => array($term),
+									'operator' => 'IN'
 		);
 	}
 	
@@ -1094,9 +1097,14 @@ function papt_getTaxonomyPosts($taxonomy = '', $term = '', $field = 'slug', $num
 	
 		$args['tax_query']['relation'] = 'OR';
 	}
+	//print_r($args);
+	
+	query_posts( $args );
 	
 	
-	return new WP_Query( $args );
+	
+	//return new WP_Query( $args );
+	
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -1112,35 +1120,35 @@ function papt_regtax() {
 		
 	register_taxonomy('photos_camera', 'attachment', array(
 							'hierarchical' => false, 
-							'label' => __('Camera', 'series'),
+							'label' => __('Cameras', 'series'),
 							'query_var' => 'photos_camera', 
 							'rewrite' => false,
 							'public'	=> true ));
 							
 	register_taxonomy('photos_lens', 'attachment', array( 
 							'hierarchical' => false, 
-							'label' => __('Lens', 'series'), 
+							'label' => __('Lenses', 'series'), 
 							'query_var' => 'photos_lens', 
 							'rewrite' => false,
 							'public'	=> true ));
 							
 	register_taxonomy( 'photos_city', 'attachment', array(
 							'hierarchical' => false, 
-							'label' => __('Photo City', 'series'), 
+							'label' => __('Photo Cities', 'series'), 
 							'query_var' => 'photos_city', 
 							'rewrite' => false,
 							'public'	=> true ));
 							
 	register_taxonomy( 'photos_state', 'attachment', array(
 							'hierarchical' => false, 
-							'label' => __('Photo State', 'series'), 
+							'label' => __('Photo States', 'series'), 
 							'query_var' => 'photos_state', 
 							'rewrite' => false,
 							'public'	=> true ));
 							
 	register_taxonomy( 'photos_country', 'attachment', array(
 							'hierarchical' => false, 
-							'label' => __('Photo Country', 'series'), 
+							'label' => __('Photo Countries', 'series'), 
 							'query_var' => 'photos_country', 
 							'rewrite' => false,
 							'public'	=> true ));
@@ -1161,7 +1169,7 @@ function papt_regtax() {
 	
 	register_taxonomy( 'photos_collection', 'attachment', array(
 							'hierarchical' => false, 
-							'label' => __('Photo Collection', 'series'), 
+							'label' => __('Photo Collections', 'series'), 
 							'query_var' => 'photos_collection', 
 							'rewrite' => false,
 							'public'	=> true ));
@@ -1176,7 +1184,7 @@ function papt_regtax() {
 function papt_storeNewMeta($data, $id) {
 	
 	$md = new papt_photoTaxonomies();
-	$file = wp_get_attachment_url($id);
+	$file = get_attached_file($id);
 	$md->loadFromFile($file);
 	$data['papt_meta'] = $md->getAllMetaData();
 	//print_r($data['papt_meta']);

@@ -3,8 +3,8 @@ Contributors: padams
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F83AGPR2W5AXS
 Tags: photos, images, taxonomies, Lightroom, meta, meta data
 Requires at least: 3.2.1
-Tested up to: 3.2.1
-Stable tag: 1.1
+Tested up to: 3.4.1
+Stable tag: 1.2
 
 This plugin extracts additional meta-data from the EXIF and XMP of uploaded images for use in populating a variety of photo specific taxonomies.
 
@@ -14,6 +14,7 @@ This plugin extracts XMP and EXIF meta-data from uploaded images for use in popu
 
 The plugin also provides widget and template functions for displaying EXIF and taxonomy data on single image (attachment) page templates.
 
+For more information on ways to use this plugin see my [WordPress For Photographers e-Book](http://www.peteradamsphoto.com/?page_id=3357 "WordPress For Photographers").
 
 == Installation ==
 
@@ -42,3 +43,7 @@ Initial version of plugin.
 = 1.1 =
 
 Name change to PhotoPress - Image Taxonomies
+
+= 1.2 =
+
+Switched to using file paths instead of attachment urls to read image file. Fixes problems with web hosters that have disabled php's allow_url_fopen directive. 
