@@ -1261,6 +1261,16 @@ function papt_makeTaxonomiesVisibleToLoop($query) {
 	return $query;
 }
 
+function papt_makeAttachmentsVisibleInTaxQueries( $query ) {
+
+	if ( is_tax() ) {
+	
+		$query->set( 'post_status', 'inherit' );
+	}
+	
+	return $query;
+}
+
 
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -1285,5 +1295,7 @@ register_sidebar(array(
   'id' => 'papt-image-sidebar',
   'description' => 'Widgets in this area will be shown on image (attachment) page templates.'
 ));
+// needed to show attachments on taxonomy pages
+add_filter( 'pre_get_posts', 'papt_makeAttachmentsVisibleInTaxQueries' );
 
 ?>
