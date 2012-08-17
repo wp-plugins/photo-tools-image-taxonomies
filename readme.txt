@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: photos, images, taxonomies, Lightroom, meta, meta data
 Requires at least: 3.2.1
 Tested up to: 3.4.1
-Stable tag: 1.3
+Stable tag: 1.4
 
 This plugin extracts additional meta-data from the EXIF and XMP of uploaded images for use in populating a variety of photo specific taxonomies.
 
@@ -51,3 +51,7 @@ Switched to using file paths instead of attachment urls to read image file. Fixe
 = 1.3 =
 
 Adding fix for showing images on taxonomy pages in themese that use the default loop query.
+
+= 1.4 =
+
+Added explicit term count update callback to fix bug where counts were not updating.
