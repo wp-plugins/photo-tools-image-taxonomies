@@ -1189,10 +1189,10 @@ function papt_regtax() {
 							'show_admin_column' => true,
 							'public'	=> true ));
 							
-	register_taxonomy( 'photos_printsizes', 'attachment', array(
+	register_taxonomy( 'photos_prints', 'attachment', array(
 							'hierarchical' => false, 
 							'label' => __('Photo Print Sizes', 'series'), 
-							'query_var' => 'photos_printsizes', 
+							'query_var' => 'photos_prints', 
 							'rewrite' => false,
 							'update_count_callback'	=> '_update_generic_term_count',
 							'show_admin_column' => true,
