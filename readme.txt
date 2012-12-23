@@ -3,8 +3,8 @@ Contributors: padams
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F83AGPR2W5AXS
 Tags: photos, images, taxonomies, Lightroom, meta, meta data
 Requires at least: 3.2.1
-Tested up to: 3.4.1
-Stable tag: 1.4
+Tested up to: 3.5
+Stable tag: 1.5
 
 This plugin extracts additional meta-data from the EXIF and XMP of uploaded images for use in populating a variety of photo specific taxonomies.
 
@@ -55,3 +55,8 @@ Adding fix for showing images on taxonomy pages in themese that use the default 
 = 1.4 =
 
 Added explicit term count update callback to fix bug where counts were not updating.
+
+= 1.5 =
+
+Added support ofr shwing taxonomy columns on the Media Library screen in WP 3.5.
+Added a new taxonomy for describing print sizes that are availabel for an image.
