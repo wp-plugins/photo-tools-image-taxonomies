@@ -1124,6 +1124,7 @@ function papt_regtax() {
 							'query_var' => 'photos_camera', 
 							'rewrite' => false,
 							'update_count_callback'	=> '_update_generic_term_count',
+							'show_admin_column' => true,
 							'public'	=> true ));
 							
 	register_taxonomy('photos_lens', 'attachment', array( 
@@ -1132,6 +1133,7 @@ function papt_regtax() {
 							'query_var' => 'photos_lens', 
 							'rewrite' => false,
 							'update_count_callback'	=> '_update_generic_term_count',
+							'show_admin_column' => true,
 							'public'	=> true ));
 							
 	register_taxonomy( 'photos_city', 'attachment', array(
@@ -1140,6 +1142,7 @@ function papt_regtax() {
 							'query_var' => 'photos_city', 
 							'rewrite' => false,
 							'update_count_callback'	=> '_update_generic_term_count',
+							'show_admin_column' => true,
 							'public'	=> true ));
 							
 	register_taxonomy( 'photos_state', 'attachment', array(
@@ -1148,6 +1151,7 @@ function papt_regtax() {
 							'query_var' => 'photos_state', 
 							'rewrite' => false,
 							'update_count_callback'	=> '_update_generic_term_count',
+							'show_admin_column' => true,
 							'public'	=> true ));
 							
 	register_taxonomy( 'photos_country', 'attachment', array(
@@ -1156,6 +1160,7 @@ function papt_regtax() {
 							'query_var' => 'photos_country', 
 							'rewrite' => false,
 							'update_count_callback'	=> '_update_generic_term_count',
+							'show_admin_column' => true,
 							'public'	=> true ));
 							
 	register_taxonomy( 'photos_people', 'attachment', array(
@@ -1164,6 +1169,7 @@ function papt_regtax() {
 							'query_var' => 'photos_people', 
 							'rewrite' => false,
 							'update_count_callback'	=> '_update_generic_term_count',
+							'show_admin_column' => true,
 							'public'	=> true ));
 							
 	register_taxonomy('photos_keywords', 'attachment', array( 
@@ -1180,6 +1186,16 @@ function papt_regtax() {
 							'query_var' => 'photos_collection', 
 							'rewrite' => false,
 							'update_count_callback'	=> '_update_generic_term_count',
+							'show_admin_column' => true,
+							'public'	=> true ));
+							
+	register_taxonomy( 'photos_printsizes', 'attachment', array(
+							'hierarchical' => false, 
+							'label' => __('Photo Print Sizes', 'series'), 
+							'query_var' => 'photos_printsizes', 
+							'rewrite' => false,
+							'update_count_callback'	=> '_update_generic_term_count',
+							'show_admin_column' => true,
 							'public'	=> true ));
 }
 
