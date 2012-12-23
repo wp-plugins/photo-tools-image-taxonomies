@@ -4,7 +4,7 @@ Plugin Name: PhotoPress - Image Taxonomies
 Plugin URI: Permalink: http://www.peteradamsphoto.com/?page_id=3148
 Description: Adds multiple photo related meta-data taxonomies to your uploaded images.
 Author: Peter Adams
-Version: 1.4
+Version: 1.5
 Author URI: http://www.peteradamsphoto.com 
 */
 
