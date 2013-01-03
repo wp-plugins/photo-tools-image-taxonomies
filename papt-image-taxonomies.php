@@ -4,7 +4,7 @@ Plugin Name: PhotoPress - Image Taxonomies
 Plugin URI: Permalink: http://www.peteradamsphoto.com/?page_id=3148
 Description: Adds multiple photo related meta-data taxonomies to your uploaded images.
 Author: Peter Adams
-Version: 1.5
+Version: 1.6
 Author URI: http://www.peteradamsphoto.com 
 */
 
@@ -799,6 +799,16 @@ function papt_addAttachment($id) {
 	$md->loadFromFile($file);
 	
 	papt_addAttachmentTags($id, $md);
+	
+	// set ALT text and caption of image
+	$post = get_post( $id );
+	
+	// make this configurable at some point
+	$alt = $post->post_title . ' by ' . $md->getCopyrightHolder() . '. ';
+	
+	if ( ! update_post_meta($id, '_wp_attachment_image_alt', $alt) ) {
+		add_post_meta($id, '_wp_attachment_image_alt', $alt);
+	}
 }
 
 function papt_addAttachmentTags($id, $md) {
@@ -897,7 +907,7 @@ class papt_displayExif extends WP_Widget {
 	function form( $instance ) {
 
 		/* Set up some default widget settings. */
-		$defaults = array( 'title' => 'Example', 'name' => 'John Doe', 'sex' => 'male', 'show_sex' => true );
+		$defaults = array( 'title' => 'Example' );
 		$instance = wp_parse_args( (array) $instance, $defaults ); ?>
 		
 		<p>
@@ -1237,11 +1247,13 @@ function papt_attachment_meta_form_fields( $form_fields, $post ) {
 	if ($post->post_type === 'attachment') {  
    		
    		// populate the alt text with the title and author slug.
-   		//$form_fields["image_alt"]['label'] = 'Alt Text';
-   		//$form_fields["image_alt"]['input'] = 'text';
-   		$form_fields["image_alt"]['value'] = $post->post_title . ' by ' . $md->getCopyrightHolder() . '. ';  
+   		if ( ! isset( $form_fields["image_alt"]['value'] ) ) {
+   			$form_fields["image_alt"]['value'] = $post->post_title . ' by ' . $md->getCopyrightHolder() . '. ';  
+   		}
    		//populate the caption with the caption.
-    	$form_fields["post_excerpt"]['value'] = $post->post_content;    
+   		if ( ! isset( $form_fields["post_excerpt"]['value'] ) ) {
+    		$form_fields["post_excerpt"]['value'] = $post->post_content;
+    	}
     }
     //print_r($form_fields);
   
@@ -1303,23 +1315,51 @@ function papt_makeAttachmentsVisibleInTaxQueries( $query ) {
 ////
 ///////////////////////////////////////////////////////////////////////////////////
 
-// needed to make attachment posts visible in the default loop.
-//add_filter('pre_get_posts', 'papt_makeTaxonomiesVisibleToLoop');
+/**
+ * Action handler for when new images are uploaded
+ */
 add_action('add_attachment', 'papt_addAttachment');
-add_action('edit_attachment', 'papt_addAttachment');
-add_filter('wp_update_attachment_metadata', 'papt_storeNewMeta',1,2);
-// needed to add product_id to new attachments
+
+/**
+ * Action handler for when Images are edited from the attachment page.
+ */
+//add_action('edit_attachment', 'papt_editAttachment');
+
+/**
+ * Handler for extracting meta data from image file and storing it as
+ * part of the Post's meta data.
+ */
 add_filter('wp_generate_attachment_metadata', 'papt_storeNewMeta',1,2);
+// is this really needed if all we are doing in pulling the metadata from the file again.
+add_filter('wp_update_attachment_metadata', 'papt_storeNewMeta',1,2);
+
+/**
+ * Registers the photo taxonomies
+ */
 add_action('init', 'papt_regtax');
-/* Add our function to the widgets_init hook. */
+
+/**
+ * Register's Widgets 
+ */
 add_action( 'widgets_init', 'papt_load_widgets' );
+
+/**
+ * Pre-populates non taxonomy fields on the Attachment Edit form.
+ */
 add_filter("attachment_fields_to_edit", "papt_attachment_meta_form_fields", 11, 2);
+
+/**
+ * Registers the papt image page sidebar
+ */
 register_sidebar(array(
-  'name' => 'PhotoTools Image Page Sidebar',
+  'name' => 'PhotoPress Image Page Sidebar',
   'id' => 'papt-image-sidebar',
   'description' => 'Widgets in this area will be shown on image (attachment) page templates.'
 ));
+
 // needed to show attachments on taxonomy pages
 add_filter( 'pre_get_posts', 'papt_makeAttachmentsVisibleInTaxQueries' );
+// needed to make attachment posts visible in the default loop.
+//add_filter('pre_get_posts', 'papt_makeTaxonomiesVisibleToLoop');
 
 ?>

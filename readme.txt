@@ -58,5 +58,11 @@ Added explicit term count update callback to fix bug where counts were not updat
 
 = 1.5 =
 
-Added support ofr shwing taxonomy columns on the Media Library screen in WP 3.5.
+Added support for showing taxonomy columns on the Media Library screen in WP 3.5.
 Added a new taxonomy for describing print sizes that are availabel for an image.
+
+= 1.6 =
+
+Fix case where taxonomy term changes made fromthe edit attachment page were not working under WP 3.5
+Fix case where ALT text changes were not populating correctly and being lost on re-edit.
+General plugin code cleanup and doco
