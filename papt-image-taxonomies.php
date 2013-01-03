@@ -1235,27 +1235,6 @@ function papt_storeNewMeta($data, $id) {
  * @return array 
  */  
 function papt_attachment_meta_form_fields( $form_fields, $post ) {  
-    // $form_fields is a special array of fields to include in the attachment form  
-    // $post is the attachment record in the database  
-    //     $post->post_type == 'attachment'  
-    // (attachments are treated as posts in WordPress)  
-  	
-  	$md = papt_getMetaData($post->ID);
-  	
-  	$author = $md->getXmp('xapRights:Owner');
-  	
-	if ($post->post_type === 'attachment') {  
-   		
-   		// populate the alt text with the title and author slug.
-   		if ( ! isset( $form_fields["image_alt"]['value'] ) ) {
-   			$form_fields["image_alt"]['value'] = $post->post_title . ' by ' . $md->getCopyrightHolder() . '. ';  
-   		}
-   		//populate the caption with the caption.
-   		if ( ! isset( $form_fields["post_excerpt"]['value'] ) ) {
-    		$form_fields["post_excerpt"]['value'] = $post->post_content;
-    	}
-    }
-    //print_r($form_fields);
   
     return $form_fields;  
 } 
@@ -1344,9 +1323,9 @@ add_action('init', 'papt_regtax');
 add_action( 'widgets_init', 'papt_load_widgets' );
 
 /**
- * Pre-populates non taxonomy fields on the Attachment Edit form.
+ * Adds non taxonomy fields on the Attachment Edit form.
  */
-add_filter("attachment_fields_to_edit", "papt_attachment_meta_form_fields", 11, 2);
+//add_filter("attachment_fields_to_edit", "papt_attachment_meta_form_fields", 11, 2);
 
 /**
  * Registers the papt image page sidebar
