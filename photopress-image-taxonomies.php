@@ -857,7 +857,7 @@ class papt_displayExif extends WP_Widget {
 		$widget_ops = array( 'classname' => 'papt_displayExif', 'description' => "Display's the EXIF info of an image. Can only be used on single image or attachment pages." );
 
 		/* Widget control settings. */
-		$control_ops = array( 'width' => 300, 'height' => 350, 'id_base' => 'papt-displayExif-widget' );
+		$control_ops = array();
 		
 		/* Create the widget. */
 		parent::WP_Widget('papt_displayExif', 'PhotoPress - Display Exif', $widget_ops, $control_ops);
@@ -865,14 +865,13 @@ class papt_displayExif extends WP_Widget {
 	
 	function widget( $args, $instance ) {
 		
+		global $post;
+		
 		extract( $args );
 		
 		/* User-selected settings. */
 		$title = apply_filters('widget_title', $instance['title'] );
-		$name = $instance['name'];
-		$sex = $instance['sex'];
-		$show_sex = isset( $instance['show_sex'] ) ? $instance['show_sex'] : false;
-
+		
 		/* Before widget (defined by themes). */
 		echo $before_widget;
 
@@ -926,12 +925,14 @@ class papt_displayTaxTerms extends WP_Widget {
 		$widget_ops = array( 'classname' => 'papt_displayTaxTerms', 'description' => "Display's the taxonomy terms of an image. Can only be used on single image or attachment pages." );
 
 		/* Widget control settings. */
-		$control_ops = array( 'width' => 300, 'height' => 350, 'id_base' => 'papt-displayTax-widget' );
+		$control_ops = array();
 		
 		parent::WP_Widget('papt_displayTaxTerms', 'PhotoPress - Display Taxonomies', $widget_ops, $control_ops);
 	}
 	
 	function widget( $args, $instance ) {
+		
+		global $post;
 		
 		extract( $args );
 		
@@ -940,7 +941,7 @@ class papt_displayTaxTerms extends WP_Widget {
 		
 		/* Before widget (defined by themes). */
 		echo $before_widget;
-
+		
 		echo "<h2>$title</h2>";		
 		echo get_the_term_list( $post->ID, 'photos_keywords', '<DL><DT>Keywords: </DT><DD>', ', ', '</DD></DL>' );	
 		echo get_the_term_list( $post->ID, 'photos_camera', '<DL><DT>Camera: </DT><DD>', ', ', '</DD></DL>' );

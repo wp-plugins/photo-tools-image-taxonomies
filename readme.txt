@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: photos, images, taxonomies, Lightroom, meta, meta data
 Requires at least: 3.2.1
 Tested up to: 3.5
-Stable tag: 1.7
+Stable tag: 1.8
 
 This plugin extracts additional meta-data from the EXIF and XMP of uploaded images for use in populating a variety of photo specific taxonomies.
 
@@ -36,30 +36,15 @@ You want an easy way to transfer and display the image meta-data that you added 
 
 == Changelog ==
 
-= 1.0 =
+= 1.8 = 
 
-Initial version of plugin.
+Fixing broken widget admin control params
+Fixing various php notices that were causing issues for some users under WP 3.5.
 
-= 1.1 =
+= 1.7 =
 
-Name change to PhotoPress - Image Taxonomies
-
-= 1.2 =
-
-Switched to using file paths instead of attachment urls to read image file. Fixes problems with web hosters that have disabled php's allow_url_fopen directive. 
-
-= 1.3 =
-
-Adding fix for showing images on taxonomy pages in themese that use the default loop query.
-
-= 1.4 =
-
-Added explicit term count update callback to fix bug where counts were not updating.
-
-= 1.5 =
-
-Added support for showing taxonomy columns on the Media Library screen in WP 3.5.
-Added a new taxonomy for describing print sizes that are availabel for an image.
+Fixes php warner for missing variable.
+Properly sets exifwidget ID.
 
 = 1.6 =
 
@@ -67,7 +52,27 @@ Fix case where taxonomy term changes made fromthe edit attachment page were not 
 Fix case where ALT text changes were not populating correctly and being lost on re-edit.
 General plugin code cleanup and doco
 
-= 1.7 =
+= 1.5 =
 
-Fixes php warner for missing variable.
-Properly sets exifwidget ID.
+Added support for showing taxonomy columns on the Media Library screen in WP 3.5.
+Added a new taxonomy for describing print sizes that are availabel for an image.
+
+= 1.4 =
+
+Added explicit term count update callback to fix bug where counts were not updating.
+
+= 1.3 =
+
+Adding fix for showing images on taxonomy pages in themese that use the default loop query.
+
+= 1.2 =
+
+Switched to using file paths instead of attachment urls to read image file. Fixes problems with web hosters that have disabled php's allow_url_fopen directive. 
+
+= 1.1 =
+
+Name change to PhotoPress - Image Taxonomies
+
+= 1.0 =
+
+Initial version of plugin.
