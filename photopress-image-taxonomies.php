@@ -4,7 +4,7 @@ Plugin Name: PhotoPress - Image Taxonomies
 Plugin URI: Permalink: http://www.peteradamsphoto.com/?page_id=3148
 Description: Adds multiple photo related meta-data taxonomies to your uploaded images.
 Author: Peter Adams
-Version: 1.6
+Version: 1.7
 Author URI: http://www.peteradamsphoto.com 
 */
 
@@ -852,16 +852,15 @@ function papt_addAttachmentTags($id, $md) {
 class papt_displayExif extends WP_Widget {
 	
 	function papt_displayExif() {
+	
 		/* Widget settings. */
 		$widget_ops = array( 'classname' => 'papt_displayExif', 'description' => "Display's the EXIF info of an image. Can only be used on single image or attachment pages." );
 
 		/* Widget control settings. */
-		//$control_ops = array( 'width' => 300, 'height' => 350, 'id_base' => 'papt-displayExif-widget' );
-		
-		parent::WP_Widget(false, $name = 'PhotoPress - Display Exif',$widget_ops, $control_ops);
+		$control_ops = array( 'width' => 300, 'height' => 350, 'id_base' => 'papt-displayExif-widget' );
 		
 		/* Create the widget. */
-		//$this->WP_Widget( 'papt-displayExif-widget', 'Photo Tools - Display EXIF', $widget_ops, $control_ops );
+		parent::WP_Widget('papt_displayExif', 'PhotoPress - Display Exif', $widget_ops, $control_ops);
 	}
 	
 	function widget( $args, $instance ) {
@@ -927,9 +926,9 @@ class papt_displayTaxTerms extends WP_Widget {
 		$widget_ops = array( 'classname' => 'papt_displayTaxTerms', 'description' => "Display's the taxonomy terms of an image. Can only be used on single image or attachment pages." );
 
 		/* Widget control settings. */
-		//$control_ops = array( 'width' => 300, 'height' => 350, 'id_base' => 'papt-displayTax-widget' );
+		$control_ops = array( 'width' => 300, 'height' => 350, 'id_base' => 'papt-displayTax-widget' );
 		
-		parent::WP_Widget(false, $name = 'PhotoPress - Display Taxonomies', $widget_ops, $control_ops);
+		parent::WP_Widget('papt_displayTaxTerms', 'PhotoPress - Display Taxonomies', $widget_ops, $control_ops);
 	}
 	
 	function widget( $args, $instance ) {
