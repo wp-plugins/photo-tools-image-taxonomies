@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: photos, images, taxonomies, Lightroom, meta, meta data
 Requires at least: 3.2.1
 Tested up to: 3.5
-Stable tag: 1.8
+Stable tag: 1.9
 
 This plugin extracts additional meta-data from the EXIF and XMP of uploaded images for use in populating a variety of photo specific taxonomies.
 
@@ -35,6 +35,10 @@ You want an easy way to transfer and display the image meta-data that you added 
 2. Single Image EXIF Widget and Taxonomy Widget.
 
 == Changelog ==
+
+= 1.9 =
+
+Change taxonomy query to use post_status of 'all' to fix conflict with WP menu system which is also a taxonomy.
 
 = 1.8 = 
 
