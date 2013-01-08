@@ -1078,7 +1078,7 @@ function papt_getTaxonomyPosts($taxonomy = '', $term = '', $field = 'slug', $num
 		//'posts_per_page' 	=> $num_posts,
 		'post_type' 		=> $post_type,
 		'paged' 			=> $paged,
-		'post_status'		=>'inherit'
+		'post_status'		=>'all'
 		//'no_found_rows' => true
 		
 	);
