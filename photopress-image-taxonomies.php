@@ -18,16 +18,59 @@ class papt_photoTaxonomies {
 	
 	var $plugin_dir = 'plugins/';
 	// raw xmp array
-	var $xmp;
+	var $xmp		= array();
 	// flattened xmp array
 	var $flat_xmp;
-	var $iptc = array();
-	var $exif = array();
+	var $iptc 		= array();
+	var $exif 		= array();
+	var $labels 	= array();
 	
 	function __construct() {
 	
 		$this->plugin_dir = dirname(__FILE__).'/plugins';
 		return;
+	}
+	
+	function get ( $keys ) {
+	
+		$pairs = array();
+	
+		if ( ! is_array( $keys ) ) {
+			
+			$keys = array( $keys );
+		}
+		
+		foreach ( $keys as $key ) {
+			
+			list ( $family, $attr ) = explode( ':', trim( $key ) );
+			
+			if ( $family === 'exif') {
+				
+				$value = $this->getExif( $attr );
+				
+			} elseif ( $family === 'iptc') {
+			
+				$value = $this->getIptc( $attr );
+			
+			} elseif ( $family === 'photopress') {
+				
+				$method = 'get'.ucwords($attr);
+				if ( method_exists( $this, $method) ) {
+				
+					$value = $this->$method( $attr );
+				} else {
+					
+					$value = 'not found';
+				}
+			} else {
+				
+				$value = $this->getXmp( $attr );
+			}
+			
+			$pairs[ $this->getLabel( $key ) ] = $value;	
+		}
+		
+		return $pairs;
 	}
 		
 	function getRawXmpValues() {
@@ -219,32 +262,47 @@ class papt_photoTaxonomies {
 		return $this->displayMeta($values, $template);
 	}
 	
-	function displayMeta($values, $template = '') {
+	function displayMeta($values, $class = '', $template = '', $container_template = '' ) {
 		
-		$nvalues = $values;
+		if ( $values ) {
 		
-		if ($nvalues) {
-		
-			if (is_array($nvalues)) {
-				return $this->makeXmpHtml($nvalues, $template);
+			if ( is_array( $values ) ) {
+				
+				return $this->makeXmpHtml( $values, $class, $template, $container_template );
+				
 			} else {
-				return $this->makeXmpHtml(array($values => $nvalues), $template);
+			
+				return $this->makeXmpHtml( array( $values => $values ), $class, $template, $container_template );
 			}
 		}
 	}
 	
-	function makeXmpHtml($values, $template = '') {
+	function render( $values, $class = '', $template = '', $container_template = '' ) {
 		
-		if ($values) {
+		return $this->displayMeta( $values, $class, $template, $container_template );
+	}
+	
+	function makeXmpHtml( $values, $class = '', $template = '', $container_template = '' ) {
 		
+		if ( $values ) {
 		
-			if (!$template) {
-				$template = '<DL><DT>%s: </DT><DD>%s</DD></DL>';
+			if ( ! $class ) {
+				
+				$class = 'table-display';
+			}
+		
+			if ( ! $template ) {
+			
+				$container_template = '<dl class="'. $class .'">%s</dl>';
+			
+				$template = '<DT>%s:</DT><DD>%s</DD>';
 			}
 			
 			$md = '';
 		
 			foreach ($values as $k => $v) {
+			
+				$i = 0;
 							
 				if ($v) {
 				
@@ -253,11 +311,19 @@ class papt_photoTaxonomies {
 					}
 					
 					$md .= sprintf($template, $this->getLabel($k), $v);
+					$i++;
 				}
 			}
 			
+			if ( $i > 0 ) {
+			
+				$md = sprintf( $container_template, $md );
+			}
+			
 			return $md;
+			
 		} else {
+		
 			return false;
 		}
 					
@@ -489,10 +555,19 @@ class papt_photoTaxonomies {
 	}
 	
 	function getLabel($str) {
-		$labels = $this->getAlllabels();
-		if (array_key_exists($str, $labels)) {
-			return $labels[$str];
+	
+		if ( ! $labels ) {
+			
+			$this->labels = $this->getAlllabels();	
+		}
+	
+		
+		if ( array_key_exists( $str, $this->labels ) ) {
+		
+			return $this->labels[ $str ];
+			
 		} else {
+		
 			return $str;
 		}
 		
@@ -502,265 +577,252 @@ class papt_photoTaxonomies {
 		
 		return array(
 
-		"dc:contributor" => "Other Contributor(s)",
-		"dc:coverage" => "Coverage (scope)",
-		"dc:creator" => "Creator(s) (Authors)",
-		"dc:date" => "Date",
-		"dc:description" => "Caption",
-		"dc:format" => "MIME Data Format",
-		"dc:identifier" => "Unique Resource Identifer",
-		"dc:language" => "Language(s)",
-		"dc:publisher" => "Publisher(s)",
-		"dc:relation" => "Relations to other documents",
-		"dc:rights" => "Rights Statement",
-		"dc:source" => "Source (from which this Resource is derived)",
-		"dc:subject" => "Keywords",
-		"dc:title" => "Title",
-		"dc:type" => "Resource Type",
+		"dc:contributor" 					=> "Other Contributor(s)",
+		"dc:coverage" 						=> "Coverage (scope)",
+		"dc:creator" 						=> "Creator(s) (Authors)",
+		"dc:date" 							=> "Date",
+		"dc:description"			 		=> "Caption",
+		"dc:format" 						=> "MIME Data Format",
+		"dc:identifier" 					=> "Unique Resource Identifer",
+		"dc:language" 						=> "Language(s)",
+		"dc:publisher" 						=> "Publisher(s)",
+		"dc:relation" 						=> "Relations to other documents",
+		"dc:rights" 						=> "Rights Statement",
+		"dc:source" 						=> "Source (from which this Resource is derived)",
+		"dc:subject" 						=> "Keywords",
+		"dc:title" 							=> "Title",
+		"dc:type" 							=> "Resource Type",
 		
-		"aux:Lens" => "Lens",
+		"aux:Lens" 							=> "Lens",
 		
-		"xmp:Advisory" => "Externally Editied Properties",
-		"xmp:BaseURL" => "Base URL for relative URL's",
-		"xmp:CreateDate" => "Original Creation Date",
-		"xmp:CreatorTool" => "Creator Tool",
-		"xmp:Identifier" => "Identifier(s)",
-		"xmp:MetadataDate" => "Metadata Last Modify Date",
-		"xmp:ModifyDate" => "Resource Last Modify Date",
-		"xmp:Nickname" => "Nickname",
-		"xmp:Thumbnails" => "Thumbnails",
+		"xmp:Advisory" 						=> "Externally Editied Properties",
+		"xmp:BaseURL" 						=> "Base URL for relative URL's",
+		"xmp:CreateDate"			 		=> "Original Creation Date",
+		"xmp:CreatorTool" 					=> "Creator Tool",
+		"xmp:Identifier" 					=> "Identifier(s)",
+		"xmp:MetadataDate" 					=> "Metadata Last Modify Date",
+		"xmp:ModifyDate" 					=> "Resource Last Modify Date",
+		"xmp:Nickname" 						=> "Nickname",
+		"xmp:Thumbnails"			 		=> "Thumbnails",
 		
-		"xmpidq:Scheme" => "Identification Scheme",
+		"xmpidq:Scheme" 					=> "Identification Scheme",
 		
 		// These are not in spec but Photoshop CS seems to use them
-		"xap:Advisory" => "Externally Editied Properties",
-		"xap:BaseURL" => "Base URL for relative URL's",
-		"xap:CreateDate" => "Original Creation Date",
-		"xap:CreatorTool" => "Creator Tool",
-		"xap:Identifier" => "Identifier(s)",
-		"xap:MetadataDate" => "Metadata Last Modify Date",
-		"xap:ModifyDate" => "Resource Last Modify Date",
-		"xap:Nickname" => "Nickname",
-		"xap:Thumbnails" => "Thumbnails",
-		"xapidq:Scheme" => "Identification Scheme",
+		"xap:Advisory" 						=> "Externally Editied Properties",
+		"xap:BaseURL" 						=> "Base URL for relative URL's",
+		"xap:CreateDate" 					=> "Original Creation Date",
+		"xap:CreatorTool" 					=> "Creator Tool",
+		"xap:Identifier" 					=> "Identifier(s)",
+		"xap:MetadataDate" 					=> "Metadata Last Modify Date",
+		"xap:ModifyDate" 					=> "Resource Last Modify Date",
+		"xap:Nickname" 						=> "Nickname",
+		"xap:Thumbnails" 					=> "Thumbnails",
+		"xapidq:Scheme" 					=> "Identification Scheme",
 		
+		"xapRights:Certificate"			 	=> "Certificate",
+		"xapRights:Copyright" 				=> "Copyright",
+		"xapRights:Marked" 					=> "Marked",
+		"xapRights:Owner" 					=> "Owner",
+		"xapRights:UsageTerms" 				=> "Legal Terms of Usage",
+		"xapRights:WebStatement" 			=> "Web Page describing rights statement (Owner URL)",
 		
-		"xapRights:Certificate" => "Certificate",
-		"xapRights:Copyright" => "Copyright",
-		"xapRights:Marked" => "Marked",
-		"xapRights:Owner" => "Owner",
-		"xapRights:UsageTerms" => "Legal Terms of Usage",
-		"xapRights:WebStatement" => "Web Page describing rights statement (Owner URL)",
+		"xapMM:ContainedResources" 			=> "Contained Resources",
+		"xapMM:ContributorResources" 		=> "Contributor Resources",
+		"xapMM:DerivedFrom" 				=> "Derived From",
+		"xapMM:DocumentID" 					=> "Document ID",
+		"xapMM:History" 					=> "History",
+		"xapMM:LastURL" 					=> "Last Written URL",
+		"xapMM:ManagedFrom"		 			=> "Managed From",
+		"xapMM:Manager" 					=> "Asset Management System",
+		"xapMM:ManageTo" 					=> "Manage To",
+		"xapMM:xmpMM:ManageUI" 				=> "Managed Resource URI",
+		"xapMM:ManagerVariant" 				=> "Particular Variant of Asset Management System",
+		"xapMM:RenditionClass" 				=> "Rendition Class",
+		"xapMM:RenditionParams"		 		=> "Rendition Parameters",
+		"xapMM:RenditionOf" 				=> "Rendition Of",
+		"xapMM:SaveID" 						=> "Save ID",
+		"xapMM:VersionID" 					=> "Version ID",
+		"xapMM:Versions" 					=> "Versions",
 		
-		"xapMM:ContainedResources" => "Contained Resources",
-		"xapMM:ContributorResources" => "Contributor Resources",
-		"xapMM:DerivedFrom" => "Derived From",
-		"xapMM:DocumentID" => "Document ID",
-		"xapMM:History" => "History",
-		"xapMM:LastURL" => "Last Written URL",
-		"xapMM:ManagedFrom" => "Managed From",
-		"xapMM:Manager" => "Asset Management System",
-		"xapMM:ManageTo" => "Manage To",
-		"xapMM:xmpMM:ManageUI" => "Managed Resource URI",
-		"xapMM:ManagerVariant" => "Particular Variant of Asset Management System",
-		"xapMM:RenditionClass" => "Rendition Class",
-		"xapMM:RenditionParams" => "Rendition Parameters",
-		"xapMM:RenditionOf" => "Rendition Of",
-		"xapMM:SaveID" => "Save ID",
-		"xapMM:VersionID" => "Version ID",
-		"xapMM:Versions" => "Versions",
+		"xapBJ:JobRef" 						=> "Job Reference",
 		
-		"xapBJ:JobRef" => "Job Reference",
+		"xmpTPg:MaxPageSize"	 			=> "Largest Page Size",
+		"xmpTPg:NPages" 					=> "Number of pages",
 		
-		"xmpTPg:MaxPageSize" => "Largest Page Size",
-		"xmpTPg:NPages" => "Number of pages",
+		"pdf:Keywords" 						=> "Keywords",
+		"pdf:PDFVersion"			 		=> "PDF file version",
+		"pdf:Producer" 						=> "PDF Creation Tool",
 		
-		"pdf:Keywords" => "Keywords",
-		"pdf:PDFVersion" => "PDF file version",
-		"pdf:Producer" => "PDF Creation Tool",
-		
-		"photoshop:AuthorsPosition" => "Authors Position",
-		"photoshop:CaptionWriter" => "Caption Writer",
-		"photoshop:Category" => "Category",
-		"photoshop:City" => "City",
-		"photoshop:Country" => "Country",
-		"photoshop:Credit" => "Credit",
-		"photoshop:DateCreated" => "Creation Date",
-		"photoshop:Headline" => "Headline",
-		"photoshop:History" => "History",                       // Not in XMP spec
-		"photoshop:Instructions" => "Instructions",
-		"photoshop:Source" => "Source",
-		"photoshop:State" => "State",
-		"photoshop:SupplementalCategories" => "Supplemental Categories",
-		"photoshop:TransmissionReference" => "Technical (Transmission) Reference",
+		"photoshop:AuthorsPosition" 		=> "Authors Position",
+		"photoshop:CaptionWriter"			=> "Caption Writer",
+		"photoshop:Category" 				=> "Category",
+		"photoshop:City" 					=> "City",
+		"photoshop:Country" 				=> "Country",
+		"photoshop:Credit" 					=> "Credit",
+		"photoshop:DateCreated" 			=> "Creation Date",
+		"photoshop:Headline" 				=> "Headline",
+		"photoshop:History" 				=> "History", // Not in XMP spec
+		"photoshop:Instructions" 			=> "Instructions",
+		"photoshop:Source" 					=> "Source",
+		"photoshop:State" 					=> "State",
+		"photoshop:SupplementalCategories" 	=> "Supplemental Categories",
+		"photoshop:TransmissionReference" 	=> "Technical (Transmission) Reference",
 		"photoshop:Urgency" => "Urgency",
 		
+		"tiff:ImageWidth" 					=> "Image Width",
+		"tiff:ImageLength" 					=> "Image Height",
+		"tiff:BitsPerSample" 				=> "Bits Per Sample",
+		"tiff:Compression" 					=> "Compression",
+		"tiff:PhotometricInterpretation" 	=> "Photometric Interpretation",
+		"tiff:Orientation" 					=> "Orientation",
+		"tiff:SamplesPerPixel" 				=> "Samples Per Pixel",
+		"tiff:PlanarConfiguration" 			=> "Planar Configuration",
+		"tiff:YCbCrSubSampling" 			=> "YCbCr Sub-Sampling",
+		"tiff:YCbCrPositioning" 			=> "YCbCr Positioning",
+		"tiff:XResolution" 					=> "X Resolution",
+		"tiff:YResolution" 					=> "Y Resolution",
+		"tiff:ResolutionUnit" 				=> "Resolution Unit",
+		"tiff:TransferFunction" 			=> "Transfer Function",
+		"tiff:WhitePoint" 					=> "White Point",
+		"tiff:PrimaryChromaticities" 		=> "Primary Chromaticities",
+		"tiff:YCbCrCoefficients" 			=> "YCbCr Coefficients",
+		"tiff:ReferenceBlackWhite" 			=> "Black & White Reference",
+		"tiff:DateTime" 					=> "Date & Time",
+		"tiff:ImageDescription" 			=> "Image Description",
+		"tiff:Make" 						=> "Make",
+		"tiff:Model" 						=> "Camera",
+		"tiff:Software" 					=> "Software",
+		"tiff:Artist" 						=> "Artist",
+		"tiff:Copyright" 					=> "Copyright",
 		
-		"tiff:ImageWidth" => "Image Width",
-		"tiff:ImageLength" => "Image Height",
-		"tiff:BitsPerSample" => "Bits Per Sample",
-		"tiff:Compression" => "Compression",
-		"tiff:PhotometricInterpretation" => "Photometric Interpretation",
-		"tiff:Orientation" => "Orientation",
-		"tiff:SamplesPerPixel" => "Samples Per Pixel",
-		"tiff:PlanarConfiguration" => "Planar Configuration",
-		"tiff:YCbCrSubSampling" => "YCbCr Sub-Sampling",
-		"tiff:YCbCrPositioning" => "YCbCr Positioning",
-		"tiff:XResolution" => "X Resolution",
-		"tiff:YResolution" => "Y Resolution",
-		"tiff:ResolutionUnit" => "Resolution Unit",
-		"tiff:TransferFunction" => "Transfer Function",
-		"tiff:WhitePoint" => "White Point",
-		"tiff:PrimaryChromaticities" => "Primary Chromaticities",
-		"tiff:YCbCrCoefficients" => "YCbCr Coefficients",
-		"tiff:ReferenceBlackWhite" => "Black & White Reference",
-		"tiff:DateTime" => "Date & Time",
-		"tiff:ImageDescription" => "Image Description",
-		"tiff:Make" => "Make",
-		"tiff:Model" => "Camera",
-		"tiff:Software" => "Software",
-		"tiff:Artist" => "Artist",
-		"tiff:Copyright" => "Copyright",
-		
-		
-		"exif:ExifVersion" => "Exif Version",
-		"exif:FlashpixVersion" => "Flash pix Version",
-		"exif:ColorSpace" => "Color Space",
-		"exif:ComponentsConfiguration" => "Components Configuration",
-		"exif:CompressedBitsPerPixel" => "Compressed Bits Per Pixel",
-		"exif:PixelXDimension" => "Pixel X Dimension",
-		"exif:PixelYDimension" => "Pixel Y Dimension",
-		"exif:MakerNote" => "Maker Note",
-		"exif:UserComment" => "User Comment",
-		"exif:RelatedSoundFile" => "Related Sound File",
-		"exif:DateTimeOriginal" => "Date & Time of Original",
-		"exif:DateTimeDigitized" => "Date & Time Digitized",
-		"exif:ExposureTime" => "Shutter Speed",
-		"exif:FNumber" => "Aperture",
-		"exif:ExposureProgram" => "Exposure Program",
-		"exif:SpectralSensitivity" => "Spectral Sensitivity",
-		"exif:ISOSpeedRatings" => "ISO Speed",
-		"exif:OECF" => "Opto-Electronic Conversion Function",
-		"exif:ShutterSpeedValue" => "Shutter Speed Value",
-		"exif:ApertureValue" => "Aperture Value",
-		"exif:BrightnessValue" => "Brightness Value",
-		"exif:ExposureBiasValue" => "Exposure Bias Value",
-		"exif:MaxApertureValue" => "Max Aperture Value",
-		"exif:SubjectDistance" => "Subject Distance",
-		"exif:MeteringMode" => "Metering Mode",
-		"exif:LightSource" => "Light Source",
-		"exif:Flash" => "Flash",
-		"exif:FocalLength" => "Focal Length",
-		"exif:SubjectArea" => "Subject Area",
-		"exif:FlashEnergy" => "Flash Energy",
-		"exif:SpatialFrequencyResponse" => "Spatial Frequency Response",
-		"exif:FocalPlaneXResolution" => "Focal Plane X Resolution",
-		"exif:FocalPlaneYResolution" => "Focal Plane Y Resolution",
-		"exif:FocalPlaneResolutionUnit" => "Focal Plane Resolution Unit",
-		"exif:SubjectLocation" => "Subject Location",
-		"exif:SensingMethod" => "Sensing Method",
-		"exif:FileSource" => "File Source",
-		"exif:SceneType" => "Scene Type",
-		"exif:CFAPattern" => "Colour Filter Array Pattern",
-		"exif:CustomRendered" => "Custom Rendered",
-		"exif:ExposureMode" => "Exposure Mode",
-		"exif:WhiteBalance" => "White Balance",
-		"exif:DigitalZoomRatio" => "Digital Zoom Ratio",
-		"exif:FocalLengthIn35mmFilm" => "Focal Length In 35mm Film",
-		"exif:SceneCaptureType" => "Scene Capture Type",
-		"exif:GainControl" => "Gain Control",
-		"exif:Contrast" => "Contrast",
-		"exif:Saturation" => "Saturation",
-		"exif:Sharpness" => "Sharpness",
-		"exif:DeviceSettingDescription" => "Device Setting Description",
-		"exif:SubjectDistanceRange" => "Subject Distance Range",
-		"exif:ImageUniqueID" => "Image Unique ID",
-		"exif:GPSVersionID" => "GPS Version ID",
-		"exif:GPSLatitude" => "GPS Latitude",
-		"exif:GPSLongitude" => "GPS Longitude",
-		"exif:GPSAltitudeRef" => "GPS Altitude Reference",
-		"exif:GPSAltitude" => "GPS Altitude",
-		"exif:GPSTimeStamp" => "GPS Time Stamp",
-		"exif:GPSSatellites" => "GPS Satellites",
-		"exif:GPSStatus" => "GPS Status",
-		"exif:GPSMeasureMode" => "GPS Measure Mode",
-		"exif:GPSDOP" => "GPS Degree Of Precision",
-		"exif:GPSSpeedRef" => "GPS Speed Reference",
-		"exif:GPSSpeed" => "GPS Speed",
-		"exif:GPSTrackRef" => "GPS Track Reference",
-		"exif:GPSTrack" => "GPS Track",
-		"exif:GPSImgDirectionRef" => "GPS Image Direction Reference",
-		"exif:GPSImgDirection" => "GPS Image Direction",
-		"exif:GPSMapDatum" => "GPS Map Datum",
-		"exif:GPSDestLatitude" => "GPS Destination Latitude",
-		"exif:GPSDestLongitude" => "GPS Destnation Longitude",
-		"exif:GPSDestBearingRef" => "GPS Destination Bearing Reference",
-		"exif:GPSDestBearing" => "GPS Destination Bearing",
-		"exif:GPSDestDistanceRef" => "GPS Destination Distance Reference",
-		"exif:GPSDestDistance" => "GPS Destination Distance",
-		"exif:GPSProcessingMethod" => "GPS Processing Method",
-		"exif:GPSAreaInformation" => "GPS Area Information",
-		"exif:GPSDifferential" => "GPS Differential",
-		
-		"stDim:w" => "Width",
-		"stDim:h" => "Height",
-		"stDim:unit" => "Units",
-		
-		"xapGImg:height" => "Height",
-		"xapGImg:width" => "Width",
-		"xapGImg:format" => "Format",
-		"xapGImg:image" => "Image",
-		
-		"stEvt:action" => "Action",
-		"stEvt:instanceID" => "Instance ID",
-		"stEvt:parameters" => "Parameters",
-		"stEvt:softwareAgent" => "Software Agent",
-		"stEvt:when" => "When",
-		
-		"stRef:instanceID" => "Instance ID",
-		"stRef:documentID" => "Document ID",
-		"stRef:versionID" => "Version ID",
-		"stRef:renditionClass" => "Rendition Class",
-		"stRef:renditionParams" => "Rendition Parameters",
-		"stRef:manager" => "Asset Management System",
-		"stRef:managerVariant" => "Particular Variant of Asset Management System",
-		"stRef:manageTo" => "Manage To",
-		"stRef:manageUI" => "Managed Resource URI",
-		
-		"stVer:comments" => "",
-		"stVer:event" => "",
-		"stVer:modifyDate" => "",
-		"stVer:modifier" => "",
-		"stVer:version" => "",
-		
-		"stJob:name" => "Job Name",
-		"stJob:id" => "Unique Job ID",
-		"stJob:url" => "URL for External Job Management File",
-		
+		"exif:ExifVersion" 					=> "Exif Version",
+		"exif:FlashpixVersion" 				=> "Flash pix Version",
+		"exif:ColorSpace" 					=> "Color Space",
+		"exif:ComponentsConfiguration" 		=> "Components Configuration",
+		"exif:CompressedBitsPerPixel" 		=> "Compressed Bits Per Pixel",
+		"exif:PixelXDimension" 				=> "Pixel X Dimension",
+		"exif:PixelYDimension" 				=> "Pixel Y Dimension",
+		"exif:MakerNote" 					=> "Maker Note",
+		"exif:UserComment"					=> "User Comment",
+		"exif:RelatedSoundFile" 			=> "Related Sound File",
+		"exif:DateTimeOriginal" 			=> "Date & Time of Original",
+		"exif:DateTimeDigitized" 			=> "Taken On",
+		"exif:ExposureTime" 				=> "Shutter Speed",
+		"exif:FNumber" 						=> "Aperture",
+		"exif:ExposureProgram" 				=> "Exposure Program",
+		"exif:SpectralSensitivity" 			=> "Spectral Sensitivity",
+		"exif:ISOSpeedRatings" 				=> "ISO Speed",
+		"exif:OECF" 						=> "Opto-Electronic Conversion Function",
+		"exif:ShutterSpeedValue" 			=> "Shutter Speed Value",
+		"exif:ApertureValue" 				=> "Aperture Value",
+		"exif:BrightnessValue" 				=> "Brightness Value",
+		"exif:ExposureBiasValue" 			=> "Exposure Bias Value",
+		"exif:MaxApertureValue" 			=> "Max Aperture Value",
+		"exif:SubjectDistance" 				=> "Subject Distance",
+		"exif:MeteringMode" 				=> "Metering Mode",
+		"exif:LightSource" 					=> "Light Source",
+		"exif:Flash" 						=> "Flash",
+		"exif:FocalLength" 					=> "Focal Length",
+		"exif:SubjectArea" 					=> "Subject Area",
+		"exif:FlashEnergy" 					=> "Flash Energy",
+		"exif:SpatialFrequencyResponse" 	=> "Spatial Frequency Response",
+		"exif:FocalPlaneXResolution" 		=> "Focal Plane X Resolution",
+		"exif:FocalPlaneYResolution" 		=> "Focal Plane Y Resolution",
+		"exif:FocalPlaneResolutionUnit" 	=> "Focal Plane Resolution Unit",
+		"exif:SubjectLocation" 				=> "Subject Location",
+		"exif:SensingMethod" 				=> "Sensing Method",
+		"exif:FileSource" 					=> "File Source",
+		"exif:SceneType" 					=> "Scene Type",
+		"exif:CFAPattern" 					=> "Colour Filter Array Pattern",
+		"exif:CustomRendered"				=> "Custom Rendered",
+		"exif:ExposureMode" 				=> "Exposure Mode",
+		"exif:WhiteBalance" 				=> "White Balance",
+		"exif:DigitalZoomRatio" 			=> "Digital Zoom Ratio",
+		"exif:FocalLengthIn35mmFilm" 		=> "Focal Length In 35mm Film",
+		"exif:SceneCaptureType" 			=> "Scene Capture Type",
+		"exif:GainControl" 					=> "Gain Control",
+		"exif:Contrast" 					=> "Contrast",
+		"exif:Saturation" 					=> "Saturation",
+		"exif:Sharpness" 					=> "Sharpness",
+		"exif:DeviceSettingDescription" 	=> "Device Setting Description",
+		"exif:SubjectDistanceRange" 		=> "Subject Distance Range",
+		"exif:ImageUniqueID" 				=> "Image Unique ID",
+		"exif:GPSVersionID" 				=> "GPS Version ID",
+		"exif:GPSLatitude" 					=> "GPS Latitude",
+		"exif:GPSLongitude" 				=> "GPS Longitude",
+		"exif:GPSAltitudeRef" 				=> "GPS Altitude Reference",
+		"exif:GPSAltitude" 					=> "GPS Altitude",
+		"exif:GPSTimeStamp" 				=> "GPS Time Stamp",
+		"exif:GPSSatellites" 				=> "GPS Satellites",
+		"exif:GPSStatus" 					=> "GPS Status",
+		"exif:GPSMeasureMode" 				=> "GPS Measure Mode",
+		"exif:GPSDOP" 						=> "GPS Degree Of Precision",
+		"exif:GPSSpeedRef" 					=> "GPS Speed Reference",
+		"exif:GPSSpeed" 					=> "GPS Speed",
+		"exif:GPSTrackRef" 					=> "GPS Track Reference",
+		"exif:GPSTrack" 					=> "GPS Track",
+		"exif:GPSImgDirectionRef" 			=> "GPS Image Direction Reference",
+		"exif:GPSImgDirection" 				=> "GPS Image Direction",
+		"exif:GPSMapDatum" 					=> "GPS Map Datum",
+		"exif:GPSDestLatitude" 				=> "GPS Destination Latitude",
+		"exif:GPSDestLongitude" 			=> "GPS Destination Longitude",
+		"exif:GPSDestBearingRef" 			=> "GPS Destination Bearing Reference",
+		"exif:GPSDestBearing" 				=> "GPS Destination Bearing",
+		"exif:GPSDestDistanceRef" 			=> "GPS Destination Distance Reference",
+		"exif:GPSDestDistance" 				=> "GPS Destination Distance",
+		"exif:GPSProcessingMethod" 			=> "GPS Processing Method",
+		"exif:GPSAreaInformation" 			=> "GPS Area Information",
+		"exif:GPSDifferential" 				=> "GPS Differential",
 		// Exif Flash
-		"exif:Fired" => "Fired",
-		"exif:Return" => "Return",
-		"exif:Mode" => "Mode",
-		"exif:Function" => "Function",
-		"exif:RedEyeMode" => "Red Eye Mode",
-		
+		"exif:Fired" 						=> "Fired",
+		"exif:Return" 						=> "Return",
+		"exif:Mode" 						=> "Mode",
+		"exif:Function" 					=> "Function",
+		"exif:RedEyeMode" 					=> "Red Eye Mode",
 		// Exif OECF/SFR
-		"exif:Columns" => "Columns",
-		"exif:Rows" => "Rows",
-		"exif:Names" => "Names",
-		"exif:Values" => "Values",
+		"exif:Columns" 						=> "Columns",
+		"exif:Rows" 						=> "Rows",
+		"exif:Names" 						=> "Names",
+		"exif:Values" 						=> "Values",
+		"exif:Settings" 					=> "Settings",
 		
-		// Exif CFAPattern
-		"exif:Columns" => "Columns",
-		"exif:Rows" => "Rows",
-		"exif:Values" => "Values",
+		"stDim:w" 							=> "Width",
+		"stDim:h" 							=> "Height",
+		"stDim:unit" 						=> "Units",
 		
+		"xapGImg:height"	 				=> "Height",
+		"xapGImg:width" 					=> "Width",
+		"xapGImg:format" 					=> "Format",
+		"xapGImg:image" 					=> "Image",
 		
-		// Exif DeviceSettings
-		"exif:Columns" => "Columns",
-		"exif:Rows" => "Rows",
-		"exif:Settings" => "Settings"
+		"stEvt:action" 						=> "Action",
+		"stEvt:instanceID" 					=> "Instance ID",
+		"stEvt:parameters" 					=> "Parameters",
+		"stEvt:softwareAgent" 				=> "Software Agent",
+		"stEvt:when" 						=> "When",
 		
+		"stRef:instanceID" 					=> "Instance ID",
+		"stRef:documentID" 					=> "Document ID",
+		"stRef:versionID" 					=> "Version ID",
+		"stRef:renditionClass" 				=> "Rendition Class",
+		"stRef:renditionParams" 			=> "Rendition Parameters",
+		"stRef:manager" 					=> "Asset Management System",
+		"stRef:managerVariant" 				=> "Particular Variant of Asset Management System",
+		"stRef:manageTo" 					=> "Manage To",
+		"stRef:manageUI" 					=> "Managed Resource URI",
+		
+		"stVer:comments" 					=> "",
+		"stVer:event" 						=> "",
+		"stVer:modifyDate" 					=> "",
+		"stVer:modifier" 					=> "",
+		"stVer:version" 					=> "",
+		
+		"stJob:name" 						=> "Job Name",
+		"stJob:id" 							=> "Unique Job ID",
+		"stJob:url" 						=> "URL for External Job Management File",
+		
+		"photopress:camera"					=> "Camera"
+				
 		);
 	}
 		
@@ -770,11 +832,10 @@ function papt_getMetaData($id) {
 	
 	$md = new papt_photoTaxonomies();
 	
-	$mdata = wp_get_attachment_metadata($id);
+	$mdata = wp_get_attachment_metadata( $id );
 	
-	if (isset($mdata['papt_meta'])) {
-		$md->loadFromArray($mdata['papt_meta']);
-		
+	if ( isset( $mdata['papt_meta'] ) ) {
+		$md->loadFromArray( $mdata['papt_meta'] );
 	} else {
 		$file = get_attached_file($id);
 		$md->loadFromFile($file);	
@@ -849,6 +910,22 @@ function papt_addAttachmentTags($id, $md) {
 
 }
 
+function photopress_showExif( $atts ) {
+
+	extract( shortcode_atts( array(
+
+		'post_id' 			=> '',
+		'keys'				=> 'exif:ExposureTime,exif:FNumber,exif:FocalLength,exif:ISOSpeedRatings,exif:DateTimeDigitized,photopress:camera'
+
+	), $atts ) );
+	
+	$keys = explode(',', $keys);
+	
+	$meta = papt_getMetaData( $post_id );
+	
+	return $meta->render( $meta->get( $keys ) );
+}
+
 class papt_displayExif extends WP_Widget {
 	
 	function papt_displayExif() {
@@ -857,7 +934,7 @@ class papt_displayExif extends WP_Widget {
 		$widget_ops = array( 'classname' => 'papt_displayExif', 'description' => "Display's the EXIF info of an image. Can only be used on single image or attachment pages." );
 
 		/* Widget control settings. */
-		$control_ops = array();
+		$control_ops = array('width' => 300);
 		
 		/* Create the widget. */
 		parent::WP_Widget('papt_displayExif', 'PhotoPress - Display Exif', $widget_ops, $control_ops);
@@ -869,6 +946,13 @@ class papt_displayExif extends WP_Widget {
 		
 		extract( $args );
 		
+		if ( ! $keys ) {
+			
+			$keys = 'exif:ExposureTime,exif:FNumber,exif:FocalLength,exif:ISOSpeedRatings,exif:DateTimeDigitized';
+		}
+		
+		$keys = explode(',', $keys);
+	 	
 		/* User-selected settings. */
 		$title = apply_filters('widget_title', $instance['title'] );
 		
@@ -877,20 +961,25 @@ class papt_displayExif extends WP_Widget {
 
 		$meta = papt_getMetaData($post->ID);
 		
-		$values = array(
-			'Date' 		=> $meta->getExif('DateTimeDigitized'),
-			'Film/ISO' 	=> $meta->getExif('ISOSpeedRatings'),
-			'Exposure Time' => $meta->getExif('ExposureTime'),
-			'Aperture' 	=> $meta->getExif('FNumber'),
-			'Focal Length' => $meta->getExif('FocalLength')
-		);
-
-		echo "<h2>$title</h2>";		
-		echo $meta->displayMeta($values);
+		$html = '';
 		
-
-		/* After widget (defined by themes). */
-		echo $after_widget;
+		$values = $meta->get( $keys );
+		
+		if ( $values ) {
+		
+			$html = $meta->render($values);
+		}
+		
+		if ( $values && $html ) {
+		
+			echo "<h2>$title</h2>";		
+			echo $html;
+			/* After widget (defined by themes). */
+			echo $after_widget;
+		} else {
+			
+			echo '<!-- Widget had nothing to output. -->';
+		}
 	}
 	
 	function update( $new_instance, $old_instance ) {
@@ -898,6 +987,7 @@ class papt_displayExif extends WP_Widget {
 
 		/* Strip tags (if needed) and update the widget settings. */
 		$instance['title'] = strip_tags( $new_instance['title'] );
+		$instance['keys'] = strip_tags( $new_instance['keys'] );
 
 		return $instance;
 	}
@@ -909,8 +999,13 @@ class papt_displayExif extends WP_Widget {
 		$instance = wp_parse_args( (array) $instance, $defaults ); ?>
 		
 		<p>
-			<label for="<?php echo $this->get_field_id( 'title' ); ?>">Title:</label>
+			<label for="<?php echo $this->get_field_id( 'title' ); ?>">Title:</label><BR>
 			<input id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" value="<?php echo $instance['title']; ?>" style="width:100%;" />
+		</p>
+		
+		<p>
+			<label for="<?php echo $this->get_field_id( 'keys' ); ?>">Meta Data Keys (optional):</label><BR>
+			<input id="<?php echo $this->get_field_id( 'keys' ); ?>" name="<?php echo $this->get_field_name( 'keys' ); ?>" value="<?php echo $instance['keys']; ?>" style="width:100%;" />
 		</p>
 
 		<?php
@@ -942,15 +1037,16 @@ class papt_displayTaxTerms extends WP_Widget {
 		/* Before widget (defined by themes). */
 		echo $before_widget;
 		
-		echo "<h2>$title</h2>";		
-		echo get_the_term_list( $post->ID, 'photos_keywords', '<DL><DT>Keywords: </DT><DD>', ', ', '</DD></DL>' );	
-		echo get_the_term_list( $post->ID, 'photos_camera', '<DL><DT>Camera: </DT><DD>', ', ', '</DD></DL>' );
-		echo get_the_term_list( $post->ID, 'photos_lens', '<DL><DT>Lens: </DT><DD>', ', ', '</DD></DL>' );
-		echo get_the_term_list( $post->ID, 'photos_city', '<DL><DT>City: </DT><DD>', ', ', '</DD></DL>' );	
-		echo get_the_term_list( $post->ID, 'photos_state', '<DL><DT>State: </DT><DD>', ', ', '</DD></DL>' );
-		echo get_the_term_list( $post->ID, 'photos_country', '<DL><DT>Country: </DT><DD>', ', ', '</DD></DL>' );
-		echo get_the_term_list( $post->ID, 'photos_people', '<DL><DT>People: </DT><DD>', ', ', '</DD></DL>' );
-		
+		echo "<h2>$title</h2>";
+		echo '<dl class="table-display">';	
+		echo get_the_term_list( $post->ID, 'photos_keywords', '<DT>Keywords: </DT><DD>', ', ', '</DD>' );	
+		echo get_the_term_list( $post->ID, 'photos_camera', '<DT>Camera: </DT><DD>', ', ', '</DD>' );
+		echo get_the_term_list( $post->ID, 'photos_lens', '<DT>Lens: </DT><DD>', ', ', '</DD>' );
+		echo get_the_term_list( $post->ID, 'photos_city', '<DT>City: </DT><DD>', ', ', '</DD>' );	
+		echo get_the_term_list( $post->ID, 'photos_state', '<DT>State: </DT><DD>', ', ', '</DD>' );
+		echo get_the_term_list( $post->ID, 'photos_country', '<DT>Country: </DT><DD>', ', ', '</DD>' );
+		echo get_the_term_list( $post->ID, 'photos_people', '<DT>People: </DT><DD>', ', ', '</DD>' );
+		echo '<dl>';
 		/* After widget (defined by themes). */
 		echo $after_widget;
 	}
@@ -1333,12 +1429,14 @@ add_action( 'widgets_init', 'papt_load_widgets' );
 register_sidebar(array(
   'name' => 'PhotoPress Image Page Sidebar',
   'id' => 'papt-image-sidebar',
-  'description' => 'Widgets in this area will be shown on image (attachment) page templates.'
+  'description' => 'Widgets in this area will be shown on image (attachment) page templates.',
+  'after_widget' => '<BR>'
 ));
 
 // needed to show attachments on taxonomy pages
 add_filter( 'pre_get_posts', 'papt_makeAttachmentsVisibleInTaxQueries' );
 // needed to make attachment posts visible in the default loop.
 //add_filter('pre_get_posts', 'papt_makeTaxonomiesVisibleToLoop');
+add_shortcode('photopress-exif', 'photopress_showExif');
 
 ?>
