@@ -422,7 +422,7 @@ class papt_photoTaxonomies {
 		  	if($val['type'] === "open") {
 		  		
 		  			
-			      	if ($val['attributes']) {
+			      	if ( array_key_exists('attributes', $val) &&  $val['attributes'] ) {
 			      		$temp_attr[$val['tag']] = $val['attributes'];
 			      	} else {
 			      		array_push($stack, $val['tag']);
@@ -434,7 +434,7 @@ class papt_photoTaxonomies {
 		    } elseif($val['type'] === "close") {
 		    	// reset the compared stack
 		    	if ($list_element == false) {
-		    		if (!$stack['value']) {
+		    		if ( ! array_key_exists('value', $stack) || !$stack['value']) {
 		    			if (array_key_exists($val['tag'], $temp_attr)) {
 		    				$xmlarray[$val['tag']] = $temp_attr[$val['tag']];
 		    			}
@@ -455,7 +455,9 @@ class papt_photoTaxonomies {
 						
 					$list_element = true;
 					// save it in our temp array
-					$list_array[] = $val['value']; 
+					if (array_key_exists('value', $val)) {
+						$list_array[] = $val['value'];
+					}
 					//print_r( $val['value']);
 					// in the case it's a list element we seralize it
 					//$value = implode(",", $list_array);
