@@ -1,20 +1,31 @@
 === PhotoPress - Image Taxonomies ===
 Contributors: padams
-Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F83AGPR2W5AXS
-Tags: photos, images, taxonomies, Lightroom, meta, meta data
+Donate link: http://www.photopressdev.com
+Tags: photos, images, taxonomies, Lightroom, meta, meta data, image taxonomies, taxonomies, photo meta-data, Adobe Lightroom, CaptureOne, digital asset managers, photo catalogs
 Requires at least: 3.2.1
 Tested up to: 3.5
 Stable tag: 1.9
 
-This plugin extracts additional meta-data from the EXIF and XMP of uploaded images for use in populating a variety of photo specific taxonomies.
+This plugin extracts EXIF and XMP meta-data of uploaded images for use in populating a variety of photo specific taxonomies.
 
 == Description ==
 
-This plugin extracts XMP and EXIF meta-data from uploaded images for use in populating a variety of photo specific WordPress taxonomies such as *keywords*, *people*, *city*, *state*, *country*, *camera*, and *lens*. Corresponding image meta-data embedded by Adobe Photoshop, Adobe Lightroom, and Capture One will automatically be populated into editable fields on WordPress's image attachment/edit forms.
+This plugin extracts a full range of XMP, IPTC, and EXIF meta-data from uploaded images for use in populating a variety of photo specific WordPress taxonomies such as *keywords*, *people*, *city*, *state*, *country*, *camera*, and *lens*. Corresponding image meta-data embedded by Adobe Photoshop, Adobe Lightroom, and Capture One will automatically be populated into editable fields on WordPress's image attachment/edit forms.
 
-The plugin also provides widget and template functions for displaying EXIF and taxonomy data on single image (attachment) page templates.
+= Features Include: =
 
-For more information on ways to use this plugin see my [WordPress For Photographers e-Book](http://www.peteradamsphoto.com/?page_id=3357 "WordPress For Photographers").
+* Extract EXIF meta-data (aperture, shutter speed, ISO, caption, etc.).
+* Extract XMP/IPTC meta-data (title, keywords, camera, lens, Country, state, city, etc.).
+* Automatically populates several custom image taxonomies (Camera, Lens, Country, State, City, Keywords, People).
+* Image/Attachment page Widget for displaying EXIF meta-data
+* Image/Attachment page Widget for displaying XMP/IPTC meta-data
+* Template functions for displaying meta-data
+
+= Premium Support =
+The PhotoPress team does not provide support for this plugin on the WordPress.org forums. One on one email support is available to users that purchase one of our [Premium Support Plans](http://www.photopressdev.com).  
+
+= The Guide To WordPress For Photographers =
+For more information on ways to use PhotoPress and other plugins to build a photpgraphy website check out the [WordPress For Photographers e-Book](http://wpphotog.com/product/the-guide-to-wordpress-for-photographers/ "WordPress For Photographers").
 
 == Installation ==
 
@@ -27,7 +38,7 @@ For more information on ways to use this plugin see my [WordPress For Photograph
 
 = Why do I need this plugin? =
 
-You want an easy way to transfer and display the image meta-data that you added using programs such as Adobe Lightroom on your WordPress powered site.
+You want an easy way to transfer and display the image meta-data that you added using programs such as Adobe Lightroom on your WordPress powered website.
 
 == Screenshots ==
 
