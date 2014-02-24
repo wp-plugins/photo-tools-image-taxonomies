@@ -1,12 +1,30 @@
 <?php
+
 /*
 Plugin Name: PhotoPress - Image Taxonomies
-Plugin URI: Permalink: http://www.peteradamsphoto.com/?page_id=3148
+Plugin URI: http://www.photopressdev.com
 Description: Adds multiple photo related meta-data taxonomies to your uploaded images.
 Author: Peter Adams
+Author URI: http://www.photopressdev.com
+License: GPL v3
 Version: 1.9
-Author URI: http://www.peteradamsphoto.com 
 */
+
+/**
+ * PhotoPress Image Taxonomies
+ *
+ * Copyright Peter Adams - peter@photopressdev.com
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
 
 /**
  * PhotoPress Taxonomies
