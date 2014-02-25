@@ -381,14 +381,18 @@ class papt_photoTaxonomies {
 	}
 	
 	function flattenXmp($xmp) {
+	
 		$nxmp = array();
 		
-		foreach ($xmp as $k => $v) {
+		if ( $xmp ) {
 		
-			if ($k === 'rdf:Description') {
-				$nxmp = array_merge($v, $nxmp);
-			} else {
-				$nxmp[$k] = $v;
+			foreach ($xmp as $k => $v) {
+			
+				if ($k === 'rdf:Description') {
+					$nxmp = array_merge($v, $nxmp);
+				} else {
+					$nxmp[$k] = $v;
+				}
 			}
 		}
 		
