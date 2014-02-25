@@ -7,7 +7,7 @@ Description: Adds multiple photo related meta-data taxonomies to your uploaded i
 Author: Peter Adams
 Author URI: http://www.photopressdev.com
 License: GPL v3
-Version: 1.9
+Version: 1.9.1
 */
 
 /**

@@ -4,7 +4,7 @@ Donate link: http://www.photopressdev.com
 Tags: photos, images, taxonomies, Lightroom, meta, meta data, image taxonomies, taxonomies, photo meta-data, Adobe Lightroom, CaptureOne, digital asset managers, photo catalogs
 Requires at least: 3.2.1
 Tested up to: 3.5
-Stable tag: 1.9
+Stable tag: 1.9.1
 
 This plugin extracts EXIF and XMP meta-data of uploaded images for use in populating a variety of photo specific taxonomies.
 
