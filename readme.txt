@@ -47,6 +47,10 @@ You want an easy way to transfer and display the image meta-data that you added 
 
 == Changelog ==
 
+= 1.9.1 =
+
+Bug fix: images with no xmp headers were not being resized by WP.
+ 
 = 1.9 =
 
 Change taxonomy query to use post_status of 'all' to fix conflict with WP menu system which is also a taxonomy.
