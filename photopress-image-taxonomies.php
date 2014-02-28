@@ -7,7 +7,7 @@ Description: Adds multiple photo related meta-data taxonomies to your uploaded i
 Author: Peter Adams
 Author URI: http://www.photopressdev.com
 License: GPL v3
-Version: 1.9.1
+Version: 1.9.2
 */
 
 /**
@@ -42,6 +42,30 @@ class papt_photoTaxonomies {
 	var $iptc 		= array();
 	var $exif 		= array();
 	var $labels 	= array();
+	var $exif_tags	= array(
+		'title',
+		'ImageDescription',
+		'Artist',
+		'Author',
+		'Copyright',
+		'FNumber',
+		'Make',
+		'Model',
+		'DateTimeDigitized',
+		'FocalLength',
+		'ISOSpeedRatings',
+		'ExposureTime',
+		'DateTimeOriginal',
+		'ImageWidth',
+		'ImageLength',
+		'Orientation',
+		'XResolution',
+		'YResolution',
+		'FocalLength',
+		'Flash',
+		'MeteringMode',
+		'ExposureProgram'
+	);
 	
 	function __construct() {
 	
@@ -346,6 +370,28 @@ class papt_photoTaxonomies {
 		}
 					
 	}
+	
+	function readExif( $file ) {
+		
+		$exif = @exif_read_data( $file );
+		$exif2 = array();
+	
+		if ($exif) {
+					
+			foreach ( $this->exif_tags as $k ) {
+				
+				if ( isset( $exif[$k] ) ) {
+					
+					$exif2[$k] = trim($exif[$k]);
+				} else {
+					$exif2[$k] = '';
+				}
+			}
+		}
+		
+		return $exif2;
+		
+	}
 		
 	function loadFromFile($file) {
 		
@@ -353,7 +399,7 @@ class papt_photoTaxonomies {
 		$this->flat_xmp = $this->flattenXmp($this->xmp);
 		//$this->iptc = wp_read_image_metadata( $file );
 		//print_r($xml_array);
-		$this->exif = @exif_read_data( $file );			
+		$this->exif = $this->readExif( $file );			
 	}
 	
 	function loadFromSerializedString($str) {
@@ -1420,15 +1466,10 @@ function papt_makeAttachmentsVisibleInTaxQueries( $query ) {
 add_action('add_attachment', 'papt_addAttachment');
 
 /**
- * Action handler for when Images are edited from the attachment page.
- */
-//add_action('edit_attachment', 'papt_editAttachment');
-
-/**
  * Handler for extracting meta data from image file and storing it as
  * part of the Post's meta data.
  */
-add_filter('wp_generate_attachment_metadata', 'papt_storeNewMeta',1,2);
+//add_filter('wp_generate_attachment_metadata', 'papt_storeNewMeta',1,2);
 // is this really needed if all we are doing in pulling the metadata from the file again.
 add_filter('wp_update_attachment_metadata', 'papt_storeNewMeta',1,2);
 
