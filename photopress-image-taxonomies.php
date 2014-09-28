@@ -1024,7 +1024,7 @@ class papt_displayExif extends WP_Widget {
 		$keys = explode(',', $keys);
 	 	
 		/* User-selected settings. */
-		$title = apply_filters('widget_title', $instance['title'] );
+		//$title = apply_filters('widget_title', $instance['title'] );
 		
 		/* Before widget (defined by themes). */
 		echo $before_widget;
@@ -1042,7 +1042,9 @@ class papt_displayExif extends WP_Widget {
 		
 		if ( $values && $html ) {
 		
-			echo "<h2>$title</h2>";		
+			if ( ! empty( $instance['title'] ) ) {
+				echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ). $args['after_title'];
+			}	
 			echo $html;
 			/* After widget (defined by themes). */
 			echo $after_widget;
@@ -1102,12 +1104,14 @@ class papt_displayTaxTerms extends WP_Widget {
 		extract( $args );
 		
 		/* User-selected settings. */
-		$title = apply_filters('widget_title', $instance['title'] );
+		//$title = apply_filters('widget_title', $instance['title'] );
 		
 		/* Before widget (defined by themes). */
 		echo $before_widget;
 		
-		echo "<h2>$title</h2>";
+		if ( ! empty( $instance['title'] ) ) {
+			echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ). $args['after_title'];
+		}
 		echo '<dl class="table-display">';	
 		echo get_the_term_list( $post->ID, 'photos_keywords', '<DT>Keywords: </DT><DD>', ', ', '</DD>' );	
 		echo get_the_term_list( $post->ID, 'photos_camera', '<DT>Camera: </DT><DD>', ', ', '</DD>' );
