@@ -3,8 +3,8 @@ Contributors: padams
 Donate link: http://www.photopressdev.com
 Tags: photos, images, taxonomies, Lightroom, meta, meta data, image taxonomies, taxonomies, photo meta-data, Adobe Lightroom, CaptureOne, digital asset managers, photo catalogs
 Requires at least: 3.2.1
-Tested up to: 3.8.1
-Stable tag: 1.9.2
+Tested up to: 4.0
+Stable tag: 1.9.3
 
 This plugin extracts EXIF and XMP meta-data of uploaded images for use in populating a variety of photo specific taxonomies.
 
@@ -46,6 +46,10 @@ You want an easy way to transfer and display the image meta-data that you added 
 2. Single Image EXIF Widget and Taxonomy Widget.
 
 == Changelog ==
+
+= 1.9.3 =
+
+Bug fix: removing hard coded H2 tags from widget title. Updated titel output ot relfect widgets API.
 
 = 1.9.2 =
 
