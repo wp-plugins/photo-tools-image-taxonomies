@@ -7,7 +7,7 @@ Description: Adds multiple photo related meta-data taxonomies to your uploaded i
 Author: Peter Adams
 Author URI: http://www.photopressdev.com
 License: GPL v3
-Version: 1.9.4
+Version: 1.9.5
 */
 
 /**
@@ -1007,7 +1007,7 @@ class papt_displayExif extends WP_Widget {
 		$control_ops = array('width' => 300);
 		
 		/* Create the widget. */
-		parent::WP_Widget('papt_displayExif', 'PhotoPress - Display Exif', $widget_ops, $control_ops);
+		parent::__construct('papt_displayExif', 'PhotoPress - Display Exif', $widget_ops, $control_ops);
 	}
 	
 	function widget( $args, $instance ) {
@@ -1095,7 +1095,7 @@ class papt_displayTaxTerms extends WP_Widget {
 		/* Widget control settings. */
 		$control_ops = array();
 		
-		parent::WP_Widget('papt_displayTaxTerms', 'PhotoPress - Display Taxonomies', $widget_ops, $control_ops);
+		parent::__construct('papt_displayTaxTerms', 'PhotoPress - Display Taxonomies', $widget_ops, $control_ops);
 	}
 	
 	function widget( $args, $instance ) {
